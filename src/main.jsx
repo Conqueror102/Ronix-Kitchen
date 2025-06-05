@@ -26,7 +26,7 @@
     Customers,
     Restaurants,
     BestSeller} from './pages/admin/components/adminComponents.jsx'
-  import Offers from './components/Offers/Offers.jsx'
+  import About from './components/About.jsx'
   import SignupPage from './pages/SignupPage.jsx'
   import SigninPage from './pages/SigninPage.jsx'
   import ForgotPasswordPage from './pages/ForgotPasswordPage.jsx'
@@ -62,9 +62,10 @@ import PreviousOrdersPage from './pages/PreviousOrdersPage.jsx'
           element: <Location />,
         },
         {
-          path: 'offers',
-          element: <Offers />,
+          path: 'about',
+          element: <About />,
         },
+
       ]
     },
     {

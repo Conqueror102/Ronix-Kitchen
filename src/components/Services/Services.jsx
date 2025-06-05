@@ -105,7 +105,7 @@ function Services() {
       
       <div className="relative  z-10   mx-auto">
         {/* Services Header */}
-       <div className='bg-softOrange px-4 sm:px-6 lg:px-16 py-16'>
+       <div className='bg-lightOrange  px-4 sm:px-6 lg:px-16 py-16'>
          <div className="text-center  mb-16">
           <span className="inline-block px-3 py-1 bg-red-600/20 border border-red-500/30 text-red-400 rounded-full text-sm font-medium mb-3">
             What We Offer
@@ -154,17 +154,17 @@ function Services() {
         {/* Special Offers Section */}
         <div className="p-16 bg-white">
           <div className="text-center mb-10">
-            <h2 className="text-2xl sm:text-3xl font-bold">
-              Special <span className="bg-clip-text text-transparent bg-gradient-to-r from-yellow-400 to-red-500">Offers</span>
+            <h2 className="text-2xl text-black sm:text-3xl font-bold">
+              Special <span className="bg-clip-text text-transparent bg-vibrantOrange">Offers</span>
             </h2>
-            <div className="w-16 h-1 bg-gradient-to-r from-yellow-400 to-red-500 mx-auto mt-3"></div>
+            <div className="w-16 h-1 bg-vibrantOrange mx-auto mt-3"></div>
           </div>
           
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {specialOffers.map((offer) => (
               <div 
                 key={offer.id}
-                className="relative overflow-hidden rounded-xl border border-gray-700 shadow-lg group"
+                className="relative overflow-hidden rounded-xl  shadow-lg group"
               >
                 <div className={`absolute inset-0 bg-gradient-to-r ${offer.color} opacity-90 transition-opacity group-hover:opacity-100`}></div>
                 <div className="relative p-6 flex flex-col h-full z-10">
@@ -181,14 +181,17 @@ function Services() {
         </div>
         
         {/* Reservation CTA */}
-        <div className="my-16 rounded-2xl overflow-hidden relative">
-          <div className="absolute inset-0 bg-black opacity-60"></div>
+        <div className="overflow-hidden relative">
+          {/* Dim layer */}
+          <div className="absolute inset-0 bg-black opacity-40 z-10"></div>
+          {/* Image */}
           <img 
             src="https://images.unsplash.com/photo-1590846406792-0adc7f938f1d" 
             alt="Restaurant interior" 
-            className="absolute inset-0 w-full h-full object-cover"
+            className="absolute inset-0 w-full h-full object-cover z-0"
           />
-          <div className="relative p-8 sm:p-12 text-center">
+          {/* Content */}
+          <div className="relative p-8 sm:p-12 text-center z-20">
             <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-white mb-4">
               Reserve Your Experience
             </h2>

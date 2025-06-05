@@ -4,12 +4,12 @@ import { Link, useLocation } from 'react-router-dom';
 
 function Sidebar() {
     const location = useLocation();
-    
+
     // Helper function to check if a link is active
     const isActive = (path) => {
         return location.pathname.includes(path);
     };
-    
+
     const navigationGroups = [
         {
             title: "Main",
@@ -86,7 +86,7 @@ function Sidebar() {
             ]
         }
     ];
-    
+
     const scrollbarHideStyles = {
         WebkitOverflowScrolling: 'touch',
         msOverflowStyle: 'none',
@@ -95,10 +95,10 @@ function Sidebar() {
             display: 'none'
         }
     };
-    
+
     return (
         <div 
-            className="h-screen w-72 flex flex-col justify-between border-r border-gray-700 bg-gray-900/95 shadow-lg overflow-y-auto"
+            className="h-screen w-72 flex flex-col justify-between top-0 left-0 sticky bg-white shadow-lg overflow-y-auto"
             style={scrollbarHideStyles}
         >
             <style jsx>{`
@@ -115,10 +115,10 @@ function Sidebar() {
             <div className="flex-1 overflow-y-auto hide-scrollbar">
                 <div className="p-6">
                     <Link to="/" className="flex items-center justify-center mb-6">
-                        <div className="w-12 h-12 rounded-full bg-gradient-to-r from-yellow-500 to-red-500 flex items-center justify-center text-white font-bold text-xl">
+                        <div className="w-12 h-12 rounded-full bg-vibrantOrange flex items-center justify-center text-white font-bold text-xl">
                             R
                         </div>
-                        <span className="ml-4 text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-yellow-400 to-red-500">
+                        <span className="ml-4 text-xl font-bold bg-clip-text text-transparent bg-vibrantOrange">
                             Admin
                         </span>
                     </Link>
@@ -128,12 +128,12 @@ function Sidebar() {
                             <img
                                 src="https://st3.depositphotos.com/6672868/13701/v/450/depositphotos_137014128-stock-illustration-user-profile-icon.jpg"
                                 alt="Admin"
-                                className="w-24 h-24 rounded-full border-2 border-yellow-500/30 object-cover shadow-md"
+                                className="w-24 h-24 rounded-full border-2 border-softPeach object-cover shadow-md"
                             />
-                            <div className="absolute -bottom-1 -right-1 w-6 h-6 bg-green-500 rounded-full border-2 border-gray-800"></div>
+                            <div className="absolute -bottom-1 -right-1 w-6 h-6 bg-green-500 rounded-full border-2 border-lightOrange"></div>
                         </div>
-                        <h2 className="mt-3 text-lg font-bold text-white">Creed</h2>
-                        <p className="text-sm text-yellow-400">Administrator</p>
+                        <h2 className="mt-3 text-lg font-bold text-vibrantOrange">Creed</h2>
+                        <p className="text-sm text-b;ack">Administrator</p>
                     </div>
                 </div>
                 
@@ -142,10 +142,18 @@ function Sidebar() {
                     {navigationGroups.map((group, index) => (
                         <div key={group.title} className="mb-6">
                             {index > 0 && (
-                                <div className="h-px bg-gradient-to-r from-transparent via-gray-700 to-transparent mb-4"></div>
+                                <div className="h-px bg-gradient-to-r from-transparent via-softPeach to-transparent mb-4"></div>
                             )}
                             
-                            <h3 className="text-xs uppercase text-gray-500 font-semibold px-4 mb-3">{group.title}</h3>
+                            <h3 className="text-xs uppercase font-semibold px-4 mb-3"
+                                style={{
+                                    color: '#FFB366', // fallback for softOrange
+                                    letterSpacing: '0.05em',
+                                    textShadow: '0 1px 0 #fff, 0 0px 2px #FFB366'
+                                }}
+                            >
+                                {group.title}
+                            </h3>
                             
                             <nav className="space-y-2">
                                 {group.items.map((item) => (
@@ -154,8 +162,8 @@ function Sidebar() {
                                         to={item.path} 
                                         className={`flex items-center px-4 py-3 rounded-lg transition-all duration-200 ${
                                             isActive(item.path) 
-                                                ? 'bg-gradient-to-r from-yellow-500/20 to-red-500/20 text-white border-l-3 border-yellow-500' 
-                                                : 'text-gray-400 hover:bg-gray-800/50 hover:text-white'
+                                                ? 'bg-vibrantOrange/20 text-vibrantOrange border-l-4 border-vibrantOrange font-semibold' 
+                                                : 'text-black hover:bg-softOrange/20 hover:text-vibrantOrange'
                                         }`}
                                     >
                                         <span className="mr-4 text-lg">{item.icon}</span>
@@ -169,7 +177,7 @@ function Sidebar() {
             </div>
             
             {/* Logout button */}
-            <div className="p-4 border-t border-gray-800">
+            <div className="p-4 border-t border-softPeach">
                 <Link 
                     to="/auth-page" 
                     className="flex items-center px-5 py-3 text-red-400 rounded-lg hover:bg-red-500/10 transition-all duration-200"

@@ -54,7 +54,7 @@ function Home() {
             Authentic Nigerian Delicacies
           </div>
                     <h1 className="text-4xl md:text-5xl font-extrabold leading-tight text-black drop-shadow-sm">
-                        Welcome to <span className="text-vibrantOrange">Ronices Paradise</span>
+                        Welcome to <span className="text-vibrantOrange">Ronix Kitchen</span>
                     </h1>
                     <p className="text-black/80 mt-2 text-lg leading-relaxed font-medium">
                         Your one-stop destination for authentic, steaming bowls of ramen perfection. Savor the rich broths, handmade noodles, and carefully crafted toppings!

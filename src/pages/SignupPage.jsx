@@ -52,14 +52,14 @@ export default function SignupPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-900 py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-md w-full bg-gray-800/50 backdrop-blur-sm rounded-xl border border-gray-700 shadow-xl p-8">
+    <div className="min-h-screen flex items-center justify-center bg-white py-12 px-4 sm:px-6 lg:px-8">
+      <div className="max-w-md w-full bg-white backdrop-blur-sm rounded-xl border border-gray-200 shadow-md p-8">
         <div className="text-center">
           <Link to="/" className="flex items-center justify-center mb-6">
-            <div className="w-12 h-12 rounded-full bg-gradient-to-r from-yellow-500 to-red-500 flex items-center justify-center text-white font-bold text-xl">R</div>
+            <div className="w-12 h-12 rounded-full bg-vibrantOrange flex items-center justify-center text-white font-bold text-xl">R</div>
           </Link>
-          <h2 className="text-3xl font-extrabold text-white">Create your account</h2>
-          <p className="mt-2 text-sm text-gray-400">
+          <h2 className="text-3xl font-extrabold text-vibrantOrange">Create your account</h2>
+          <p className="mt-2 text-sm text-gray-700">
             Join Ramen Paradise to order delicious ramen and get exclusive offers
           </p>
         </div>
@@ -74,7 +74,7 @@ export default function SignupPage() {
 
           {/* Email Input */}
           <div className="space-y-2">
-            <label htmlFor="email" className="block text-sm font-medium text-gray-300">
+            <label htmlFor="email" className="block text-sm font-medium text-black">
               Email Address
             </label>
             <input
@@ -89,7 +89,7 @@ export default function SignupPage() {
                   message: "Please enter a valid email address",
                 },
               })}
-              className={`w-full px-4 py-3 bg-gray-800/60 border ${
+              className={`bg-lightOrange border w-full border-softPeach rounded-lg px-4 py-2 text-deepGreen focus:outline-none focus:ring-2 focus:ring-vibrantOrange focus:border-transparent  ${
                 errors.email ? "border-red-500" : "border-gray-700"
               } rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-transparent transition-colors`}
             />
@@ -100,7 +100,7 @@ export default function SignupPage() {
 
           {/* Password Input */}
           <div className="space-y-2">
-            <label htmlFor="password" className="block text-sm font-medium text-gray-300">
+            <label htmlFor="password" className="block text-sm font-medium text-black">
               Password
             </label>
             <input
@@ -115,7 +115,7 @@ export default function SignupPage() {
                   message: "Password must be at least 6 characters",
                 },
               })}
-              className={`w-full px-4 py-3 bg-gray-800/60 border ${
+              className={`bg-lightOrange border w-full border-softPeach rounded-lg px-4 py-2 text-deepGreen focus:outline-none focus:ring-2 focus:ring-vibrantOrange focus:border-transparent ${
                 errors.password ? "border-red-500" : "border-gray-700"
               } rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-transparent transition-colors`}
             />
@@ -126,7 +126,7 @@ export default function SignupPage() {
 
           {/* Confirm Password Input */}
           <div className="space-y-2">
-            <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-300">
+            <label htmlFor="confirmPassword" className="block text-sm font-medium text-black">
               Confirm Password
             </label>
             <input
@@ -138,7 +138,7 @@ export default function SignupPage() {
                 required: "Please confirm your password",
                 validate: value => value === password || "Passwords do not match"
               })}
-              className={`w-full px-4 py-3 bg-gray-800/60 border ${
+              className={`bg-lightOrange border w-full border-softPeach rounded-lg px-4 py-2 text-deepGreen focus:outline-none focus:ring-2 focus:ring-vibrantOrange focus:border-transparent  ${
                 errors.confirmPassword ? "border-red-500" : "border-gray-700"
               } rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-transparent transition-colors`}
             />
@@ -148,7 +148,7 @@ export default function SignupPage() {
           </div>
 
           {/* Terms Agreement Checkbox */}
-          <div className="flex items-start">
+          {/* <div className="flex items-start">
             <div className="flex items-center h-5">
               <input
                 id="terms"
@@ -165,13 +165,13 @@ export default function SignupPage() {
                 <p className="mt-1 text-sm text-red-400">{errors.terms.message}</p>
               )}
             </div>
-          </div>
+          </div> */}
 
           {/* Submit Button */}
           <button
             type="submit"
             disabled={isLoading}
-            className="w-full py-3 bg-gradient-to-r from-yellow-500 to-red-500 hover:from-yellow-600 hover:to-red-600 text-white font-semibold rounded-lg transition duration-300 transform hover:-translate-y-1 disabled:opacity-70 disabled:transform-none"
+            className="w-full py-3 bg-black hover:bg-black/80 text-white font-semibold rounded-lg transition duration-300 transform hover:-translate-y-1 disabled:opacity-70 disabled:transform-none"
           >
             {isLoading ? (
               <span className="flex items-center justify-center">
@@ -187,18 +187,18 @@ export default function SignupPage() {
           </button>
 
           {/* Link to Sign In */}
-          <div className="text-center text-gray-400">
+          <div className="text-center text-gray-700">
             Already have an account?{" "}
             <Link
               to="/auth/signin"
-              className="font-medium text-yellow-400 hover:text-yellow-300 transition-colors focus:outline-none"
+              className="font-medium text-vibrantOrange hover:text-yellow-300 transition-colors focus:outline-none"
             >
               Sign in
             </Link>
           </div>
 
           {/* Or continue with social */}
-          <div className="mt-6">
+          {/* <div className="mt-6">
             <div className="relative">
               <div className="absolute inset-0 flex items-center">
                 <div className="w-full border-t border-gray-700"></div>
@@ -228,12 +228,12 @@ export default function SignupPage() {
                 <span className="ml-2">Google</span>
               </button>
             </div>
-          </div>
+          </div> */}
         </form>
         <div className="mt-8 text-center">
           <Link 
             to="/home" 
-            className="text-gray-400 hover:text-white transition-colors duration-300 flex items-center justify-center"
+            className="text-gray-500 hover:text-black transition-colors duration-300 flex items-center justify-center"
           >
             <svg 
               xmlns="http://www.w3.org/2000/svg" 

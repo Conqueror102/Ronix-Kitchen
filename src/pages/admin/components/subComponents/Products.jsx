@@ -73,44 +73,44 @@ function Products() {
         <div className='p-6 space-y-6'>
             {/* Header */}
             <div className="mb-6">
-                <h2 className='text-2xl font-bold text-white'>
-                    Product <span className="bg-clip-text text-transparent bg-gradient-to-r from-yellow-400 to-red-500">Management</span>
+                <h2 className='text-2xl font-bold text-black'>
+                    Product <span className="bg-clip-text text-transparent bg-vibrantOrange">Management</span>
                 </h2>
-                <p className='text-gray-400 mt-2'>
+                <p className='text-gray-600 mt-2'>
                     Add, edit, remove, and view your products from this section.
                 </p>
-                <div className="w-24 h-1 bg-gradient-to-r from-yellow-400 to-red-500 mt-4"></div>
+                <div className="w-24 h-1 bg-gradient-to-r from-softOrange via-vibrantOrange to-softOrange mt-4"></div>
             </div>
             
             {/* Cards */}
-            <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5'>
+            <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8'>
                 {cards.map((card, index) => (
                     <div 
                         key={index} 
                         onClick={() => navigate(card.slug)}
-                        className='bg-gray-800/50 backdrop-blur-sm rounded-xl border border-gray-700 overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 cursor-pointer group'
+                        className="bg-white/90 rounded-xl shadow-md overflow-hidden hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1 cursor-pointer group"
                     >
                         <div className="p-5">
                             <div className="flex items-center mb-4">
-                                <div className="h-10 w-10 rounded-lg bg-gradient-to-r from-yellow-500/20 to-red-500/20 flex items-center justify-center text-yellow-400 mr-3 group-hover:text-white transition-colors duration-300">
+                                <div className="h-10 w-10 rounded-lg bg-softOrange flex items-center justify-center text-vibrantOrange mr-3 group-hover:bg-vibrantOrange group-hover:text-white transition-colors duration-300">
                                     {card.icon}
                                 </div>
-                                <h3 className='text-lg font-semibold text-white group-hover:text-yellow-400 transition-colors duration-300'>
+                                <h3 className='text-lg font-semibold text-black group-hover:text-vibrantOrange transition-colors duration-300'>
                                     {card.title}
                                 </h3>
                             </div>
-                            <p className='text-gray-400 text-sm mb-4'>
+                            <p className='text-gray-600 text-sm mb-4'>
                                 {card.description}
                             </p>
                             <div className="flex justify-end">
-                                <div className="w-8 h-8 rounded-full bg-gray-700 flex items-center justify-center text-gray-400 group-hover:bg-gradient-to-r from-yellow-500 to-red-500 group-hover:text-white transition-all duration-300 transform group-hover:scale-110">
+                                <div className="w-8 h-8 rounded-full bg-softOrange flex items-center justify-center text-vibrantOrange group-hover:bg-vibrantOrange group-hover:text-white transition-all duration-300 transform group-hover:scale-110">
                                     <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                                     </svg>
                                 </div>
                             </div>
                         </div>
-                        <div className="h-1 w-full bg-gradient-to-r from-yellow-500/0 via-yellow-500 to-red-500/0 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300"></div>
+                        <div className="h-1 w-full bg-gradient-to-r from-softOrange/0 via-vibrantOrange to-softOrange/0 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300"></div>
                     </div>
                 ))}
             </div>

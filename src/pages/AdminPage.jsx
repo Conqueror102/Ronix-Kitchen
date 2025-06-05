@@ -23,9 +23,9 @@ export default function AdminPage() {
   // }
   
   return (
-    <div className="flex h-screen bg-gray-900">
+    <div className="flex h-scree">
       <AdminSidebar />
-      <main className="flex-1 overflow-auto p-6 bg-gray-800">
+      <main className="flex-1 overflow-auto p-6 bg-slateGray-50">
         <Outlet />
       </main>
     </div>

@@ -191,15 +191,15 @@ function Orders() {
   const getStatusBadge = (status) => {
     switch (status) {
       case 'pending':
-        return 'bg-yellow-500/20 text-yellow-400';
+        return 'bg-yellow-500/10 text-yellow-600';
       case 'processing':
-        return 'bg-blue-500/20 text-blue-400';
+        return 'bg-blue-500/10 text-blue-600';
       case 'delivered':
-        return 'bg-green-500/20 text-green-400';
+        return 'bg-green-500/10 text-green-600';
       case 'cancelled':
-        return 'bg-red-500/20 text-red-400';
+        return 'bg-red-500/10 text-red-600';
       default:
-        return 'bg-gray-500/20 text-gray-400';
+        return 'bg-softOrange/40 text-black';
     }
   };
   
@@ -239,19 +239,18 @@ function Orders() {
   return (
     <div className='flex flex-col space-y-6'>
       {/* Header */}
-      <div className="bg-gray-800/50 backdrop-blur-sm rounded-xl border border-gray-700 shadow-lg overflow-hidden">
+      <div className="bg-white/90 rounded-xl shadow-md overflow-hidden">
         <div className="p-6">
           <div className="flex flex-col md:flex-row justify-between items-start md:items-center">
             <div>
-              <h2 className="text-2xl font-bold text-white mb-2">
-                Order <span className="bg-clip-text text-transparent bg-gradient-to-r from-yellow-400 to-red-500">Management</span>
+              <h2 className="text-2xl font-bold text-black mb-2">
+                Order <span className="bg-clip-text text-transparent bg-vibrantOrange">Management</span>
               </h2>
-              <p className="text-gray-400">
+              <p className="text-gray-600">
                 Track and manage customer orders
               </p>
-              <div className="w-24 h-1 bg-gradient-to-r from-yellow-400 to-red-500 mt-4"></div>
+              <div className="w-24 h-1 bg-gradient-to-r from-softOrange via-vibrantOrange to-softOrange mt-4"></div>
             </div>
-            
             <div className="mt-4 md:mt-0 flex flex-col sm:flex-row space-y-3 sm:space-y-0 sm:space-x-3">
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -264,15 +263,14 @@ function Orders() {
                   placeholder="Search orders..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  className="pl-10 pr-4 py-2 w-full lg:w-60 bg-gray-700 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-500"
+                  className="pl-10 pr-4 py-2 w-full lg:w-60 bg-softOrange/40 text-black rounded-lg focus:outline-none focus:ring-2 focus:ring-vibrantOrange"
                 />
               </div>
-              
               <div className="flex space-x-2">
                 <select
                   value={statusFilter}
                   onChange={(e) => setStatusFilter(e.target.value)}
-                  className="px-4 py-2 bg-gray-700 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-500"
+                  className="px-4 py-2 bg-softOrange/40 text-black rounded-lg focus:outline-none focus:ring-2 focus:ring-vibrantOrange"
                 >
                   <option value="all">All Statuses</option>
                   <option value="pending">Pending</option>
@@ -280,11 +278,10 @@ function Orders() {
                   <option value="delivered">Delivered</option>
                   <option value="cancelled">Cancelled</option>
                 </select>
-                
                 <select
                   value={dateFilter}
                   onChange={(e) => setDateFilter(e.target.value)}
-                  className="px-4 py-2 bg-gray-700 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-500"
+                  className="px-4 py-2 bg-softOrange/40 text-black rounded-lg focus:outline-none focus:ring-2 focus:ring-vibrantOrange"
                 >
                   <option value="all">All Time</option>
                   <option value="today">Today</option>
@@ -300,14 +297,14 @@ function Orders() {
       {/* Order Stats */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
         {/* Total Orders */}
-        <div className="bg-gray-800/50 backdrop-blur-sm rounded-xl border border-gray-700 shadow-lg overflow-hidden">
+        <div className="bg-white/90 rounded-xl shadow-md overflow-hidden">
           <div className="p-4">
             <div className="flex justify-between items-start">
               <div>
-                <p className="text-gray-400 text-sm">Total Orders</p>
-                <h3 className="text-2xl font-bold text-white">{totals.totalOrders}</h3>
+                <p className="text-gray-600 text-sm">Total Orders</p>
+                <h3 className="text-2xl font-bold text-black">{totals.totalOrders}</h3>
               </div>
-              <div className="h-10 w-10 bg-purple-500/20 rounded-lg flex items-center justify-center text-purple-400">
+              <div className="h-10 w-10 bg-blue-500/10 rounded-lg flex items-center justify-center text-blue-500">
                 <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
                 </svg>
@@ -315,16 +312,15 @@ function Orders() {
             </div>
           </div>
         </div>
-        
         {/* Pending Orders */}
-        <div className="bg-gray-800/50 backdrop-blur-sm rounded-xl border border-gray-700 shadow-lg overflow-hidden">
+        <div className="bg-white/90 rounded-xl shadow-md overflow-hidden">
           <div className="p-4">
             <div className="flex justify-between items-start">
               <div>
-                <p className="text-gray-400 text-sm">Pending</p>
-                <h3 className="text-2xl font-bold text-white">{totals.pending}</h3>
+                <p className="text-gray-600 text-sm">Pending</p>
+                <h3 className="text-2xl font-bold text-black">{totals.pending}</h3>
               </div>
-              <div className="h-10 w-10 bg-yellow-500/20 rounded-lg flex items-center justify-center text-yellow-400">
+              <div className="h-10 w-10 bg-yellow-500/10 rounded-lg flex items-center justify-center text-yellow-600">
                 <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
@@ -332,16 +328,15 @@ function Orders() {
             </div>
           </div>
         </div>
-        
         {/* Processing Orders */}
-        <div className="bg-gray-800/50 backdrop-blur-sm rounded-xl border border-gray-700 shadow-lg overflow-hidden">
+        <div className="bg-white/90 rounded-xl shadow-md overflow-hidden">
           <div className="p-4">
             <div className="flex justify-between items-start">
               <div>
-                <p className="text-gray-400 text-sm">Processing</p>
-                <h3 className="text-2xl font-bold text-white">{totals.processing}</h3>
+                <p className="text-gray-600 text-sm">Processing</p>
+                <h3 className="text-2xl font-bold text-black">{totals.processing}</h3>
               </div>
-              <div className="h-10 w-10 bg-blue-500/20 rounded-lg flex items-center justify-center text-blue-400">
+              <div className="h-10 w-10 bg-blue-500/10 rounded-lg flex items-center justify-center text-blue-600">
                 <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
                 </svg>
@@ -349,16 +344,15 @@ function Orders() {
             </div>
           </div>
         </div>
-        
         {/* Delivered Orders */}
-        <div className="bg-gray-800/50 backdrop-blur-sm rounded-xl border border-gray-700 shadow-lg overflow-hidden">
+        <div className="bg-white/90 rounded-xl shadow-md overflow-hidden">
           <div className="p-4">
             <div className="flex justify-between items-start">
               <div>
-                <p className="text-gray-400 text-sm">Delivered</p>
-                <h3 className="text-2xl font-bold text-white">{totals.delivered}</h3>
+                <p className="text-gray-600 text-sm">Delivered</p>
+                <h3 className="text-2xl font-bold text-black">{totals.delivered}</h3>
               </div>
-              <div className="h-10 w-10 bg-green-500/20 rounded-lg flex items-center justify-center text-green-400">
+              <div className="h-10 w-10 bg-green-500/10 rounded-lg flex items-center justify-center text-green-600">
                 <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                 </svg>
@@ -366,16 +360,15 @@ function Orders() {
             </div>
           </div>
         </div>
-        
         {/* Total Revenue */}
-        <div className="bg-gray-800/50 backdrop-blur-sm rounded-xl border border-gray-700 shadow-lg overflow-hidden">
+        <div className="bg-white/90 rounded-xl shadow-md overflow-hidden">
           <div className="p-4">
             <div className="flex justify-between items-start">
               <div>
-                <p className="text-gray-400 text-sm">Revenue</p>
-                <h3 className="text-2xl font-bold text-white">{formatCurrency(totals.revenue)}</h3>
+                <p className="text-gray-600 text-sm">Revenue</p>
+                <h3 className="text-2xl font-bold text-black">{formatCurrency(totals.revenue)}</h3>
               </div>
-              <div className="h-10 w-10 bg-green-500/20 rounded-lg flex items-center justify-center text-green-400">
+              <div className="h-10 w-10 bg-green-500/10 rounded-lg flex items-center justify-center text-green-600">
                 <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
@@ -389,30 +382,30 @@ function Orders() {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Orders Table */}
         <div className={`${selectedOrder ? 'lg:col-span-2' : 'lg:col-span-3'}`}>
-          <div className="bg-gray-800/50 backdrop-blur-sm rounded-xl border border-gray-700 shadow-lg overflow-hidden">
-            <div className="px-6 py-4 border-b border-gray-700 flex justify-between items-center">
-              <h3 className="text-lg font-semibold text-white">Orders List</h3>
-              <span className="text-gray-400 text-sm">
+          <div className="bg-white/90 rounded-xl shadow-md overflow-hidden">
+            <div className="px-6 py-4 border-b border-softOrange/40 flex justify-between items-center">
+              <h3 className="text-lg font-semibold text-black">Orders List</h3>
+              <span className="text-gray-600 text-sm">
                 {filteredOrders.length} {filteredOrders.length === 1 ? 'order' : 'orders'} found
               </span>
             </div>
             <div className="overflow-x-auto">
               <table className="w-full">
-                <thead className="bg-gray-700/50">
+                <thead className="bg-softOrange/40">
                   <tr>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Order ID</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Customer</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Date</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Total</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Status</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Actions</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-black uppercase tracking-wider">Order ID</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-black uppercase tracking-wider">Customer</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-black uppercase tracking-wider">Date</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-black uppercase tracking-wider">Total</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-black uppercase tracking-wider">Status</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-black uppercase tracking-wider">Actions</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-gray-700">
+                <tbody className="divide-y divide-softOrange/40">
                   {filteredOrders.length > 0 ? (
                     filteredOrders.map((order, index) => (
-                      <tr key={order.id} className={index % 2 === 0 ? 'bg-gray-800/30' : 'bg-gray-800/10'}>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-white">
+                      <tr key={order.id} className={index % 2 === 0 ? 'bg-softOrange/10' : 'bg-white/60'}>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-black">
                           {order.id}
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
@@ -425,15 +418,15 @@ function Orders() {
                               />
                             </div>
                             <div className="ml-3">
-                              <div className="text-sm font-medium text-white">{order.customer.name}</div>
-                              <div className="text-sm text-gray-400">{order.customer.email}</div>
+                              <div className="text-sm font-medium text-black">{order.customer.name}</div>
+                              <div className="text-sm text-gray-600">{order.customer.email}</div>
                             </div>
                           </div>
                         </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
                           {formatDate(order.date)}
                         </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
                           {formatCurrency(order.total)}
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
@@ -444,13 +437,13 @@ function Orders() {
                         <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                           <button 
                             onClick={() => viewOrderDetails(order)}
-                            className="text-blue-400 hover:text-blue-300 transition duration-150 mr-4"
+                            className="text-vibrantOrange hover:text-orange-600 transition duration-150 mr-4"
                           >
                             View
                           </button>
                           <div className="relative inline-block text-left">
                             <select 
-                              className="bg-gray-700 text-gray-300 text-xs rounded-lg py-1 px-2 border border-gray-600 focus:outline-none focus:ring-1 focus:ring-yellow-500"
+                              className="bg-softOrange/40 text-black text-xs rounded-lg py-1 px-2 border border-softOrange focus:outline-none focus:ring-1 focus:ring-vibrantOrange"
                               value={order.status}
                               onChange={(e) => updateOrderStatus(order.id, e.target.value)}
                             >
@@ -466,7 +459,7 @@ function Orders() {
                   ) : (
                     <tr>
                       <td colSpan="6" className="px-6 py-10 text-center text-gray-400">
-                        <svg xmlns="http://www.w3.org/2000/svg" className="h-10 w-10 mx-auto text-gray-500 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-10 w-10 mx-auto text-gray-300 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4" />
                         </svg>
                         <p className="text-lg">No orders found</p>
@@ -477,8 +470,8 @@ function Orders() {
                 </tbody>
               </table>
             </div>
-            <div className="px-6 py-4 bg-gray-800/20 border-t border-gray-700">
-              <p className="text-sm text-gray-400">
+            <div className="px-6 py-4 bg-softOrange/10 border-t border-softOrange/40">
+              <p className="text-sm text-gray-600">
                 Showing {filteredOrders.length} {filteredOrders.length === 1 ? 'order' : 'orders'} 
                 {statusFilter !== 'all' ? ` with status "${statusFilter}"` : ''} 
                 {dateFilter !== 'all' ? ` from ${dateFilter === 'today' ? 'today' : dateFilter === 'week' ? 'this week' : 'this month'}` : ''}

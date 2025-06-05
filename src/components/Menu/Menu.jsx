@@ -106,7 +106,7 @@ function Menu() {
   };
 
   return (
-    <div className="bg-softOrange min-h-screen flex flex-col">
+    <div className="bg-lightOrange min-h-screen flex flex-col">
       {/* Header */}
       {/* <Header /> */}
       

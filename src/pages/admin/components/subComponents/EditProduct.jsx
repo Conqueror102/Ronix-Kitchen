@@ -152,19 +152,18 @@ function EditProduct() {
       <style>{scrollbarHideStyles}</style>
       
       {/* Header */}
-      <div className="bg-gray-800/50 backdrop-blur-sm rounded-xl border border-gray-700 shadow-lg overflow-hidden">
+      <div className="bg-white/90 rounded-xl shadow-md overflow-hidden">
         <div className="p-6">
           <div className="flex flex-col md:flex-row justify-between items-start md:items-center">
             <div>
-              <h2 className="text-2xl font-bold text-white mb-2">
-                Edit <span className="bg-clip-text text-transparent bg-gradient-to-r from-yellow-400 to-red-500">Products</span>
+              <h2 className="text-2xl font-bold text-black mb-2">
+                Edit <span className="bg-clip-text text-transparent bg-vibrantOrange">Products</span>
               </h2>
-              <p className="text-gray-400">
+              <p className="text-gray-600">
                 Update existing products in your menu
               </p>
-              <div className="w-24 h-1 bg-gradient-to-r from-yellow-400 to-red-500 mt-4"></div>
+              <div className="w-24 h-1 bg-gradient-to-r from-softOrange via-vibrantOrange to-softOrange mt-4"></div>
             </div>
-            
             <div className="mt-4 md:mt-0">
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -177,7 +176,7 @@ function EditProduct() {
                   placeholder="Search products..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  className="pl-10 pr-4 py-2 w-full lg:w-64 bg-gray-700 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-500"
+                  className="pl-10 pr-4 py-2 w-full lg:w-64 bg-softOrange/40 text-black rounded-lg focus:outline-none focus:ring-2 focus:ring-vibrantOrange"
                 />
               </div>
             </div>
@@ -187,7 +186,7 @@ function EditProduct() {
 
       {/* Success Message */}
       {submitSuccess && (
-        <div className="bg-green-500/20 border border-green-500 text-green-400 px-4 py-3 rounded-lg flex items-center">
+        <div className="bg-green-500/10 text-green-600 px-4 py-3 rounded-lg flex items-center">
           <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
           </svg>
@@ -198,30 +197,30 @@ function EditProduct() {
       {/* Main content */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Product list */}
-        <div className="bg-gray-800/50 backdrop-blur-sm rounded-xl border border-gray-700 shadow-lg overflow-hidden h-[550px] flex flex-col">
-          <div className="px-6 py-4 border-b border-gray-700">
-            <h3 className="text-lg font-semibold text-white">Select a Product</h3>
+        <div className="bg-white/90 rounded-xl shadow-md overflow-hidden h-[550px] flex flex-col">
+          <div className="px-6 py-4 border-b border-softOrange/40">
+            <h3 className="text-lg font-semibold text-black">Select a Product</h3>
           </div>
           
           {isLoading ? (
             <div className="p-6 flex justify-center flex-grow">
               <div className="flex items-center space-x-2">
-                <svg className="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <svg className="animate-spin h-5 w-5 text-vibrantOrange" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                   <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                   <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                 </svg>
-                <span className="text-gray-400">Loading products...</span>
+                <span className="text-vibrantOrange">Loading products...</span>
               </div>
             </div>
           ) : (
             <>
               {filteredProducts.length > 0 ? (
-                <div className="divide-y divide-gray-700 overflow-y-auto hide-scrollbar flex-grow">
+                <div className="divide-y divide-softOrange/40 overflow-y-auto hide-scrollbar flex-grow">
                   {filteredProducts.map(product => (
                     <div 
                       key={product.id}
                       onClick={() => handleSelectProduct(product)}
-                      className={`p-4 cursor-pointer hover:bg-gray-700/30 transition-colors ${selectedProduct?.id === product.id ? 'bg-gray-700/50' : ''}`}
+                      className={`p-4 cursor-pointer hover:bg-softOrange/20 transition-colors ${selectedProduct?.id === product.id ? 'bg-softOrange/40' : ''}`}
                     >
                       <div className="flex items-center">
                         <div className="h-12 w-12 rounded-md overflow-hidden flex-shrink-0">
@@ -233,21 +232,21 @@ function EditProduct() {
                         </div>
                         <div className="ml-4 flex-1">
                           <div className="flex justify-between">
-                            <h4 className="text-white font-medium">{product.name}</h4>
-                            <span className="text-yellow-500 font-medium">${product.price.toFixed(2)}</span>
+                            <h4 className="text-black font-medium">{product.name}</h4>
+                            <span className="text-vibrantOrange font-medium">${product.price.toFixed(2)}</span>
                           </div>
-                          <p className="text-gray-400 text-sm truncate mt-1">{product.description}</p>
+                          <p className="text-gray-600 text-sm truncate mt-1">{product.description}</p>
                           <div className="flex items-center mt-2">
-                            <span className="text-xs px-2 py-1 bg-gray-700 text-gray-300 rounded-full capitalize">
+                            <span className="text-xs px-2 py-1 bg-softOrange/40 text-black rounded-full capitalize">
                               {product.category}
                             </span>
                             {product.featured && (
-                              <span className="ml-2 text-xs px-2 py-1 bg-yellow-500/20 text-yellow-400 rounded-full">
+                              <span className="ml-2 text-xs px-2 py-1 bg-yellow-500/10 text-yellow-600 rounded-full">
                                 Featured
                               </span>
                             )}
                             {!product.inStock && (
-                              <span className="ml-2 text-xs px-2 py-1 bg-red-500/20 text-red-400 rounded-full">
+                              <span className="ml-2 text-xs px-2 py-1 bg-red-500/10 text-red-600 rounded-full">
                                 Out of Stock
                               </span>
                             )}
@@ -259,19 +258,19 @@ function EditProduct() {
                 </div>
               ) : (
                 <div className="p-6 text-center flex-grow flex flex-col justify-center">
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-12 w-12 mx-auto text-gray-500 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-12 w-12 mx-auto text-vibrantOrange mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3 10h18M3 14h18m-9-4v8m-7 0h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
                   </svg>
-                  <p className="text-gray-400 text-lg">No products found</p>
-                  <p className="text-gray-500 text-sm mt-1">Try adjusting your search term</p>
+                  <p className="text-vibrantOrange text-lg">No products found</p>
+                  <p className="text-gray-600 text-sm mt-1">Try adjusting your search term</p>
                 </div>
               )}
             </>
           )}
           
           {filteredProducts.length > 0 && (
-            <div className="px-6 py-4 bg-gray-800/20 border-t border-gray-700 mt-auto">
-              <p className="text-sm text-gray-400">
+            <div className="px-6 py-4 bg-softOrange/10 border-t border-softOrange/40 mt-auto">
+              <p className="text-sm text-gray-600">
                 {filteredProducts.length} {filteredProducts.length === 1 ? 'product' : 'products'} found
                 {searchTerm ? ` matching "${searchTerm}"` : ''}
               </p>
@@ -282,20 +281,20 @@ function EditProduct() {
         {/* Edit form */}
         <div className="lg:col-span-2">
           {selectedProduct ? (
-            <div className="bg-gray-800/50 backdrop-blur-sm rounded-xl border border-gray-700 shadow-lg overflow-hidden">
-              <div className="px-6 py-4 border-b border-gray-700">
-                <h3 className="text-lg font-semibold text-white">Edit Product Information</h3>
+            <div className="bg-white/90 rounded-xl shadow-md overflow-hidden">
+              <div className="px-6 py-4 border-b border-softOrange/40">
+                <h3 className="text-lg font-semibold text-black">Edit Product Information</h3>
               </div>
               <div className="p-6">
                 <form onSubmit={handleSubmit(updateProduct)} className="space-y-6">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
-                      <label className="block text-gray-400 mb-2 font-medium">Product Name</label>
+                      <label className="block text-black mb-2 font-medium">Product Name</label>
                       <input 
                         type="text" 
                         id="productName"
                         placeholder="Enter product name" 
-                        className={`w-full bg-gray-700 text-white px-4 py-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-500 ${errors.productName ? 'border border-red-500' : ''}`}
+                        className={`w-full bg-softOrange/40 text-black px-4 py-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-vibrantOrange ${errors.productName ? 'border border-red-500' : ''}`}
                         {...register("productName", { required: true })}
                       />
                       {errors.productName && (
@@ -304,13 +303,13 @@ function EditProduct() {
                     </div>
                     
                     <div>
-                      <label className="block text-gray-400 mb-2 font-medium">Product Price (USD)</label>
+                      <label className="block text-black mb-2 font-medium">Product Price (USD)</label>
                       <input 
                         type="number" 
                         id="productPrice"
                         step="0.01"
                         placeholder="0.00" 
-                        className={`w-full bg-gray-700 text-white px-4 py-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-500 ${errors.productPrice ? 'border border-red-500' : ''}`}
+                        className={`w-full bg-softOrange/40 text-black px-4 py-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-vibrantOrange ${errors.productPrice ? 'border border-red-500' : ''}`}
                         {...register("productPrice", { 
                           required: true,
                           min: 0.01,
@@ -325,10 +324,10 @@ function EditProduct() {
                   
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
-                      <label className="block text-gray-400 mb-2 font-medium">Category</label>
+                      <label className="block text-black mb-2 font-medium">Category</label>
                       <select 
                         id="category"
-                        className="w-full bg-gray-700 text-white px-4 py-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-500"
+                        className="w-full bg-softOrange/40 text-black px-4 py-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-vibrantOrange"
                         {...register("category", { required: true })}
                         disabled={categoriesLoading}
                       >
@@ -349,11 +348,11 @@ function EditProduct() {
                       
                       {categoriesLoading && (
                         <div className="mt-1 flex items-center">
-                          <svg className="animate-spin h-4 w-4 text-yellow-500 mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                          <svg className="animate-spin h-4 w-4 text-vibrantOrange mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                             <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                             <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                           </svg>
-                          <span className="text-sm text-gray-400">Loading available categories...</span>
+                          <span className="text-sm text-gray-600">Loading available categories...</span>
                         </div>
                       )}
                       
@@ -364,49 +363,49 @@ function EditProduct() {
                     
                     <div className="grid grid-cols-2 gap-4">
                       <div>
-                        <label className="block text-gray-400 mb-2 font-medium">Featured</label>
+                        <label className="block text-black mb-2 font-medium">Featured</label>
                         <div className="flex space-x-4">
                           <label className="flex items-center">
                             <input 
                               type="radio" 
                               value="true" 
-                              className="form-radio h-4 w-4 text-yellow-500 bg-gray-700 border-gray-600 focus:ring-0"
+                              className="form-radio h-4 w-4 text-vibrantOrange bg-softOrange border-softOrange focus:ring-0"
                               {...register("featured")}
                             />
-                            <span className="ml-2 text-white">Yes</span>
+                            <span className="ml-2 text-black">Yes</span>
                           </label>
                           <label className="flex items-center">
                             <input 
                               type="radio" 
                               value="false" 
-                              className="form-radio h-4 w-4 text-yellow-500 bg-gray-700 border-gray-600 focus:ring-0"
+                              className="form-radio h-4 w-4 text-vibrantOrange bg-softOrange border-softOrange focus:ring-0"
                               {...register("featured")}
                             />
-                            <span className="ml-2 text-white">No</span>
+                            <span className="ml-2 text-black">No</span>
                           </label>
                         </div>
                       </div>
                       
                       <div>
-                        <label className="block text-gray-400 mb-2 font-medium">In Stock</label>
+                        <label className="block text-black mb-2 font-medium">In Stock</label>
                         <div className="flex space-x-4">
                           <label className="flex items-center">
                             <input 
                               type="radio" 
                               value="true" 
-                              className="form-radio h-4 w-4 text-green-500 bg-gray-700 border-gray-600 focus:ring-0"
+                              className="form-radio h-4 w-4 text-green-500 bg-softOrange border-softOrange focus:ring-0"
                               {...register("inStock")}
                             />
-                            <span className="ml-2 text-white">Yes</span>
+                            <span className="ml-2 text-black">Yes</span>
                           </label>
                           <label className="flex items-center">
                             <input 
                               type="radio" 
                               value="false" 
-                              className="form-radio h-4 w-4 text-red-500 bg-gray-700 border-gray-600 focus:ring-0"
+                              className="form-radio h-4 w-4 text-red-500 bg-softOrange border-softOrange focus:ring-0"
                               {...register("inStock")}
                             />
-                            <span className="ml-2 text-white">No</span>
+                            <span className="ml-2 text-black">No</span>
                           </label>
                         </div>
                       </div>
@@ -414,12 +413,12 @@ function EditProduct() {
                   </div>
                   
                   <div>
-                    <label className="block text-gray-400 mb-2 font-medium">Description</label>
+                    <label className="block text-black mb-2 font-medium">Description</label>
                     <textarea 
                       id="productDescription"
                       rows="4"
                       placeholder="Describe your product..." 
-                      className={`w-full bg-gray-700 text-white px-4 py-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-500 ${errors.productDescription ? 'border border-red-500' : ''} hide-scrollbar`}
+                      className={`w-full bg-softOrange/40 text-black px-4 py-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-vibrantOrange ${errors.productDescription ? 'border border-red-500' : ''} hide-scrollbar`}
                       {...register("productDescription", { required: true, minLength: 10 })}
                     ></textarea>
                     {errors.productDescription && (
@@ -429,11 +428,11 @@ function EditProduct() {
                   
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
-                      <label className="block text-gray-400 mb-2 font-medium">Product Image</label>
-                      <div className="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-600 border-dashed rounded-lg">
+                      <label className="block text-black mb-2 font-medium">Product Image</label>
+                      <div className="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-softOrange border-dashed rounded-lg">
                         <div className="space-y-1 text-center">
                           <svg
-                            className="mx-auto h-12 w-12 text-gray-400"
+                            className="mx-auto h-12 w-12 text-vibrantOrange"
                             stroke="currentColor"
                             fill="none"
                             viewBox="0 0 48 48"
@@ -446,10 +445,10 @@ function EditProduct() {
                               strokeLinejoin="round"
                             />
                           </svg>
-                          <div className="flex text-sm text-gray-400">
+                          <div className="flex text-sm text-black">
                             <label
                               htmlFor="file-upload"
-                              className="relative cursor-pointer bg-gray-700 rounded-md font-medium text-yellow-500 hover:text-yellow-400 focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-yellow-500"
+                              className="relative cursor-pointer bg-softOrange rounded-md font-medium text-vibrantOrange hover:text-white hover:bg-vibrantOrange focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-vibrantOrange"
                             >
                               <span className="px-3 py-2 rounded-md">Change image</span>
                               <input 
@@ -463,15 +462,15 @@ function EditProduct() {
                             </label>
                             <p className="pl-1 pt-2">or drag and drop</p>
                           </div>
-                          <p className="text-xs text-gray-500">PNG, JPG, GIF up to 10MB</p>
+                          <p className="text-xs text-gray-600">PNG, JPG, GIF up to 10MB</p>
                         </div>
                       </div>
                     </div>
                     
                     <div>
-                      <label className="block text-gray-400 mb-2 font-medium">Image Preview</label>
+                      <label className="block text-black mb-2 font-medium">Image Preview</label>
                       {imagePreview ? (
-                        <div className="mt-1 relative aspect-video rounded-lg overflow-hidden bg-gray-700 border border-gray-600">
+                        <div className="mt-1 relative aspect-video rounded-lg overflow-hidden bg-softOrange/40 border border-softOrange">
                           <img
                             src={imagePreview}
                             alt="Product Preview"
@@ -479,8 +478,8 @@ function EditProduct() {
                           />
                         </div>
                       ) : (
-                        <div className="mt-1 flex items-center justify-center h-40 rounded-lg bg-gray-700 border border-gray-600">
-                          <p className="text-gray-400">No image selected</p>
+                        <div className="mt-1 flex items-center justify-center h-40 rounded-lg bg-softOrange/40 border border-softOrange">
+                          <p className="text-vibrantOrange">No image selected</p>
                         </div>
                       )}
                     </div>
@@ -490,7 +489,7 @@ function EditProduct() {
                     <button
                       type="submit"
                       disabled={isSubmitting}
-                      className={`flex-1 px-4 py-3 bg-gradient-to-r from-yellow-500 to-red-500 hover:from-yellow-600 hover:to-red-600 text-white font-medium rounded-lg transition duration-300 flex items-center justify-center ${isSubmitting ? 'opacity-70 cursor-not-allowed' : ''}`}
+                      className={`flex-1 px-4 py-3 bg-black hover:bg-gray-900 text-white font-medium rounded-lg transition duration-300 flex items-center justify-center ${isSubmitting ? 'opacity-70 cursor-not-allowed' : ''}`}
                     >
                       {isSubmitting ? (
                         <>
@@ -513,7 +512,7 @@ function EditProduct() {
                     <button
                       type="button"
                       onClick={() => setSelectedProduct(null)}
-                      className="px-4 py-3 bg-gray-700 hover:bg-gray-600 text-white font-medium rounded-lg transition duration-300 flex items-center justify-center"
+                      className="px-4 py-3 bg-softOrange/40 hover:bg-softOrange text-black font-medium rounded-lg transition duration-300 flex items-center justify-center"
                     >
                       <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -525,13 +524,13 @@ function EditProduct() {
               </div>
             </div>
           ) : (
-            <div className="bg-gray-800/50 backdrop-blur-sm rounded-xl border border-gray-700 shadow-lg overflow-hidden">
+            <div className="bg-white/90 rounded-xl shadow-md overflow-hidden">
               <div className="p-10 flex flex-col items-center justify-center text-center">
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-16 w-16 text-gray-500 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-16 w-16 text-vibrantOrange mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                 </svg>
-                <h3 className="text-xl font-semibold text-white mb-2">Select a Product to Edit</h3>
-                <p className="text-gray-400 max-w-md">
+                <h3 className="text-xl font-semibold text-black mb-2">Select a Product to Edit</h3>
+                <p className="text-gray-600 max-w-md">
                   Choose a product from the list to edit its details, update pricing, change images, or modify its availability status.
                 </p>
               </div>

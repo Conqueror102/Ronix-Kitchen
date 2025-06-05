@@ -155,27 +155,26 @@ function BestSeller() {
   return (
     <div className='flex flex-col space-y-6'>
       {/* Header */}
-      <div className="bg-gray-800/50 backdrop-blur-sm rounded-xl border border-gray-700 shadow-lg overflow-hidden">
+      <div className="bg-white/90 rounded-xl shadow-md overflow-hidden">
         <div className="p-6">
           <div className="flex flex-col md:flex-row justify-between items-start md:items-center">
             <div>
-              <h2 className="text-2xl font-bold text-white mb-2">
-                Best <span className="bg-clip-text text-transparent bg-gradient-to-r from-yellow-400 to-red-500">Sellers</span>
+              <h2 className="text-2xl font-bold text-black mb-2">
+                Best <span className="bg-clip-text text-transparent bg-vibrantOrange">Sellers</span>
               </h2>
-              <p className="text-gray-400">
+              <p className="text-gray-600">
                 Track your top performing products and sales data
               </p>
-              <div className="w-24 h-1 bg-gradient-to-r from-yellow-400 to-red-500 mt-4"></div>
+              <div className="w-24 h-1 bg-gradient-to-r from-softOrange via-vibrantOrange to-softOrange mt-4"></div>
             </div>
-            
             <div className="mt-4 md:mt-0 flex items-center">
-              <div className="bg-gray-700 rounded-lg p-1 flex space-x-1">
+              <div className="bg-softOrange/40 rounded-lg p-1 flex space-x-1">
                 <button 
                   onClick={() => setTimeRange('week')}
                   className={`px-3 py-1.5 text-sm font-medium rounded-md transition-colors ${
                     timeRange === 'week' 
-                      ? 'bg-gradient-to-r from-yellow-500 to-red-500 text-white' 
-                      : 'text-gray-300 hover:text-white'
+                      ? 'bg-gradient-to-r from-softOrange via-vibrantOrange to-softOrange text-white' 
+                      : 'text-black hover:text-vibrantOrange'
                   }`}
                 >
                   Week
@@ -184,8 +183,8 @@ function BestSeller() {
                   onClick={() => setTimeRange('month')}
                   className={`px-3 py-1.5 text-sm font-medium rounded-md transition-colors ${
                     timeRange === 'month' 
-                      ? 'bg-gradient-to-r from-yellow-500 to-red-500 text-white' 
-                      : 'text-gray-300 hover:text-white'
+                      ? 'bg-gradient-to-r from-softOrange via-vibrantOrange to-softOrange text-white' 
+                      : 'text-black hover:text-vibrantOrange'
                   }`}
                 >
                   Month
@@ -194,8 +193,8 @@ function BestSeller() {
                   onClick={() => setTimeRange('year')}
                   className={`px-3 py-1.5 text-sm font-medium rounded-md transition-colors ${
                     timeRange === 'year' 
-                      ? 'bg-gradient-to-r from-yellow-500 to-red-500 text-white' 
-                      : 'text-gray-300 hover:text-white'
+                      ? 'bg-gradient-to-r from-softOrange via-vibrantOrange to-softOrange text-white' 
+                      : 'text-black hover:text-vibrantOrange'
                   }`}
                 >
                   Year
@@ -208,7 +207,7 @@ function BestSeller() {
 
       {/* Error Message */}
       {error && (
-        <div className="bg-red-500/20 border border-red-500 text-red-400 px-4 py-3 rounded-lg flex items-center">
+        <div className="bg-red-500/10 text-red-600 px-4 py-3 rounded-lg flex items-center">
           <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
           </svg>
@@ -219,19 +218,19 @@ function BestSeller() {
       {/* Summary Cards */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         {/* Total Sales */}
-        <div className="bg-gray-800/50 backdrop-blur-sm rounded-xl border border-gray-700 shadow-lg overflow-hidden">
+        <div className="bg-white/90 rounded-xl shadow-md overflow-hidden">
           <div className="p-6">
             <div className="flex justify-between items-start">
               <div>
-                <p className="text-gray-400 text-sm mb-1">Total Sales</p>
+                <p className="text-gray-600 text-sm mb-1">Total Sales</p>
                 {isLoading ? (
-                  <div className="h-7 w-20 bg-gray-700 rounded animate-pulse"></div>
+                  <div className="h-7 w-20 bg-softOrange/40 rounded animate-pulse"></div>
                 ) : (
-                  <h3 className="text-2xl font-bold text-white">{totalSales}</h3>
+                  <h3 className="text-2xl font-bold text-black">{totalSales}</h3>
                 )}
-                <p className="text-gray-400 text-sm mt-1">Products sold this {timeRange}</p>
+                <p className="text-gray-600 text-sm mt-1">Products sold this {timeRange}</p>
               </div>
-              <div className="h-12 w-12 bg-yellow-500/20 rounded-lg flex items-center justify-center text-yellow-500">
+              <div className="h-12 w-12 bg-vibrantOrange/20 rounded-lg flex items-center justify-center text-vibrantOrange">
                 <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
                 </svg>
@@ -239,21 +238,20 @@ function BestSeller() {
             </div>
           </div>
         </div>
-        
         {/* Total Revenue */}
-        <div className="bg-gray-800/50 backdrop-blur-sm rounded-xl border border-gray-700 shadow-lg overflow-hidden">
+        <div className="bg-white/90 rounded-xl shadow-md overflow-hidden">
           <div className="p-6">
             <div className="flex justify-between items-start">
               <div>
-                <p className="text-gray-400 text-sm mb-1">Total Revenue</p>
+                <p className="text-gray-600 text-sm mb-1">Total Revenue</p>
                 {isLoading ? (
-                  <div className="h-7 w-28 bg-gray-700 rounded animate-pulse"></div>
+                  <div className="h-7 w-28 bg-softOrange/40 rounded animate-pulse"></div>
                 ) : (
-                  <h3 className="text-2xl font-bold text-white">{formatCurrency(totalRevenue)}</h3>
+                  <h3 className="text-2xl font-bold text-black">{formatCurrency(totalRevenue)}</h3>
                 )}
-                <p className="text-gray-400 text-sm mt-1">Revenue this {timeRange}</p>
+                <p className="text-gray-600 text-sm mt-1">Revenue this {timeRange}</p>
               </div>
-              <div className="h-12 w-12 bg-green-500/20 rounded-lg flex items-center justify-center text-green-500">
+              <div className="h-12 w-12 bg-green-500/20 rounded-lg flex items-center justify-center text-green-600">
                 <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
@@ -261,21 +259,20 @@ function BestSeller() {
             </div>
           </div>
         </div>
-        
         {/* Average Rating */}
-        <div className="bg-gray-800/50 backdrop-blur-sm rounded-xl border border-gray-700 shadow-lg overflow-hidden">
+        <div className="bg-white/90 rounded-xl shadow-md overflow-hidden">
           <div className="p-6">
             <div className="flex justify-between items-start">
               <div>
-                <p className="text-gray-400 text-sm mb-1">Average Rating</p>
+                <p className="text-gray-600 text-sm mb-1">Average Rating</p>
                 {isLoading ? (
-                  <div className="h-7 w-16 bg-gray-700 rounded animate-pulse"></div>
+                  <div className="h-7 w-16 bg-softOrange/40 rounded animate-pulse"></div>
                 ) : (
-                  <h3 className="text-2xl font-bold text-white">{averageRating} / 5</h3>
+                  <h3 className="text-2xl font-bold text-black">{averageRating} / 5</h3>
                 )}
-                <p className="text-gray-400 text-sm mt-1">From customer reviews</p>
+                <p className="text-gray-600 text-sm mt-1">From customer reviews</p>
               </div>
-              <div className="h-12 w-12 bg-blue-500/20 rounded-lg flex items-center justify-center text-blue-500">
+              <div className="h-12 w-12 bg-blue-500/20 rounded-lg flex items-center justify-center text-blue-600">
                 <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.783-.57-.38-1.81.588-1.81h4.915a1 1 0 00.95-.69l1.519-4.674z" />
                 </svg>
@@ -286,15 +283,15 @@ function BestSeller() {
       </div>
 
       {/* Filters and sorting */}
-      <div className="bg-gray-800/50 backdrop-blur-sm rounded-xl border border-gray-700 shadow-lg overflow-hidden">
+      <div className="bg-white/90 rounded-xl shadow-md overflow-hidden">
         <div className="p-6">
           <div className="flex flex-col md:flex-row justify-between gap-4">
             <div className="w-full md:w-1/2 lg:w-1/4">
-              <label className="block text-gray-400 text-sm mb-2">Filter by Category</label>
+              <label className="block text-gray-600 text-sm mb-2">Filter by Category</label>
               <select 
                 value={category}
                 onChange={(e) => setCategory(e.target.value)}
-                className="w-full bg-gray-700 text-white px-4 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-500"
+                className="w-full bg-softOrange/40 text-black px-4 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-vibrantOrange"
                 disabled={categoriesLoading}
               >
                 <option value="all">All Categories</option>
@@ -313,21 +310,21 @@ function BestSeller() {
               
               {categoriesLoading && (
                 <div className="mt-1 flex items-center">
-                  <svg className="animate-spin h-3 w-3 text-yellow-500 mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                  <svg className="animate-spin h-3 w-3 text-vibrantOrange mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                     <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                     <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                   </svg>
-                  <span className="text-xs text-gray-400">Loading categories...</span>
+                  <span className="text-xs text-gray-600">Loading categories...</span>
                 </div>
               )}
             </div>
             
             <div className="w-full md:w-1/2 lg:w-1/4">
-              <label className="block text-gray-400 text-sm mb-2">Sort by</label>
+              <label className="block text-gray-600 text-sm mb-2">Sort by</label>
               <select 
                 value={sortBy}
                 onChange={(e) => setSortBy(e.target.value)}
-                className="w-full bg-gray-700 text-white px-4 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-500"
+                className="w-full bg-softOrange/40 text-black px-4 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-vibrantOrange"
               >
                 <option value="sales">Most Sales</option>
                 <option value="revenue">Highest Revenue</option>
@@ -337,11 +334,11 @@ function BestSeller() {
             </div>
             
             <div className="w-full md:w-1/2 lg:w-1/4">
-              <label className="block text-gray-400 text-sm mb-2">Display Limit</label>
+              <label className="block text-gray-600 text-sm mb-2">Display Limit</label>
               <select 
                 value={limit}
                 onChange={(e) => setLimit(Number(e.target.value))}
-                className="w-full bg-gray-700 text-white px-4 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-500"
+                className="w-full bg-softOrange/40 text-black px-4 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-vibrantOrange"
               >
                 <option value="5">Top 5</option>
                 <option value="10">Top 10</option>
@@ -354,69 +351,69 @@ function BestSeller() {
       </div>
 
       {/* Bestsellers table */}
-      <div className="bg-gray-800/50 backdrop-blur-sm rounded-xl border border-gray-700 shadow-lg overflow-hidden">
-        <div className="px-6 py-4 border-b border-gray-700">
-          <h3 className="text-lg font-semibold text-white">Top Bestselling Products</h3>
+      <div className="bg-white/90 rounded-xl shadow-md overflow-hidden">
+        <div className="px-6 py-4 border-b border-softOrange/40">
+          <h3 className="text-lg font-semibold text-black">Top Bestselling Products</h3>
         </div>
         
         {isLoading ? (
           <div className="p-8 flex justify-center">
             <div className="flex items-center space-x-2">
-              <svg className="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+              <svg className="animate-spin h-5 w-5 text-vibrantOrange" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                 <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                 <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
               </svg>
-              <span className="text-gray-400">Loading product data...</span>
+              <span className="text-vibrantOrange">Loading product data...</span>
             </div>
           </div>
         ) : displayedProducts.length > 0 ? (
           <div className="overflow-x-auto">
             <table className="w-full">
-              <thead className="bg-gray-700/50">
+              <thead className="bg-softOrange/40">
                 <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Product</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Category</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Price</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Sales</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Revenue</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Rating</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Growth</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-black uppercase tracking-wider">Product</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-black uppercase tracking-wider">Category</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-black uppercase tracking-wider">Price</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-black uppercase tracking-wider">Sales</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-black uppercase tracking-wider">Revenue</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-black uppercase tracking-wider">Rating</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-black uppercase tracking-wider">Growth</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-gray-700">
+              <tbody className="divide-y divide-softOrange/40">
                 {displayedProducts.map((product, index) => (
-                  <tr key={product.id} className={index % 2 === 0 ? 'bg-gray-800/30' : 'bg-gray-800/10'}>
+                  <tr key={product.id} className={index % 2 === 0 ? 'bg-softOrange/10' : 'bg-white/60'}>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="flex items-center">
                         <div className="h-10 w-10 flex-shrink-0 rounded-md overflow-hidden">
                           <img className="h-10 w-10 object-cover" src={product.image} alt={product.name} />
                         </div>
                         <div className="ml-4">
-                          <div className="text-sm font-medium text-white">{product.name}</div>
-                          <div className="text-sm text-gray-400">#{product.id}</div>
+                          <div className="text-sm font-medium text-black">{product.name}</div>
+                          <div className="text-sm text-gray-600">#{product.id}</div>
                         </div>
                       </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <span className="px-2 py-1 text-xs font-medium rounded-full bg-gray-700 text-gray-300 capitalize">
+                      <span className="px-2 py-1 text-xs font-medium rounded-full bg-softOrange/40 text-black capitalize">
                         {product.category}
                       </span>
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-black">
                       {formatCurrency(product.price)}
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-black">
                       {product.sales || 0} units
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-black">
                       {formatCurrency(product.revenue || 0)}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="flex items-center">
-                        <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-yellow-400" viewBox="0 0 20 20" fill="currentColor">
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-vibrantOrange" viewBox="0 0 20 20" fill="currentColor">
                           <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
                         </svg>
-                        <span className="ml-1 text-sm text-gray-300">{(product.rating || 0).toFixed(1)}</span>
+                        <span className="ml-1 text-sm text-black">{(product.rating || 0).toFixed(1)}</span>
                       </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
@@ -433,18 +430,18 @@ function BestSeller() {
         ) : (
           <div className="p-8 flex justify-center">
             <div className="text-center">
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-12 w-12 mx-auto text-gray-500 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-12 w-12 mx-auto text-vibrantOrange mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
               </svg>
-              <p className="text-lg text-gray-300">No products found</p>
-              <p className="text-sm text-gray-400 mt-1">Try adjusting your filters or time range</p>
+              <p className="text-lg text-vibrantOrange">No products found</p>
+              <p className="text-sm text-gray-600 mt-1">Try adjusting your filters or time range</p>
             </div>
           </div>
         )}
         
         {!isLoading && displayedProducts.length > 0 && (
-          <div className="px-6 py-4 bg-gray-800/20 border-t border-gray-700">
-            <p className="text-sm text-gray-400">
+          <div className="px-6 py-4 bg-softOrange/10 border-t border-softOrange/40">
+            <p className="text-sm text-gray-600">
               Showing top {displayedProducts.length} products by {sortBy === 'sales' ? 'sales' : 
               sortBy === 'revenue' ? 'revenue' : 
               sortBy === 'rating' ? 'rating' : 'growth rate'} for the {timeRange}
@@ -455,16 +452,16 @@ function BestSeller() {
       </div>
       
       {/* Export and report section */}
-      <div className="bg-gray-800/50 backdrop-blur-sm rounded-xl border border-gray-700 shadow-lg overflow-hidden">
+      <div className="bg-white/90 rounded-xl shadow-md overflow-hidden">
         <div className="p-6">
           <div className="flex flex-col md:flex-row justify-between items-center">
             <div>
-              <h3 className="text-lg font-semibold text-white mb-2">Generate Reports</h3>
-              <p className="text-gray-400 text-sm">Export your bestseller data for further analysis</p>
+              <h3 className="text-lg font-semibold text-black mb-2">Generate Reports</h3>
+              <p className="text-gray-600 text-sm">Export your bestseller data for further analysis</p>
             </div>
             <div className="mt-4 md:mt-0 flex space-x-4">
               <button 
-                className="px-4 py-2 bg-gray-700 hover:bg-gray-600 text-white font-medium rounded-lg transition duration-300 flex items-center"
+                className="px-4 py-2 bg-softOrange/40 hover:bg-softOrange text-black font-medium rounded-lg transition duration-300 flex items-center"
                 onClick={() => {
                   // Handle CSV export logic
                   console.log("Export to CSV");
@@ -477,7 +474,7 @@ function BestSeller() {
                 CSV
               </button>
               <button 
-                className="px-4 py-2 bg-gradient-to-r from-yellow-500 to-red-500 hover:from-yellow-600 hover:to-red-600 text-white font-medium rounded-lg transition duration-300 flex items-center"
+                className="px-4 py-2 bg-gradient-to-r from-softOrange via-vibrantOrange to-softOrange hover:from-vibrantOrange hover:to-softOrange text-white font-medium rounded-lg transition duration-300 flex items-center"
                 onClick={() => {
                   // Handle PDF export logic
                   console.log("Export to PDF");

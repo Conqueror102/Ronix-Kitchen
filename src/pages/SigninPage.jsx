@@ -45,14 +45,15 @@ export default function SigninPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-900 py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-md w-full bg-gray-800/50 backdrop-blur-sm rounded-xl border border-gray-700 shadow-xl p-8">
+    <div className="min-h-screen flex items-center justify-center   py-12 px-4 sm:px-6 lg:px-8">
+      <div className="max-w-md w-full border border-gray-100 bg-white  rounded-xl  shadow-lg p-8">
         <div className="text-center">
           <Link to="/" className="flex items-center justify-center mb-6">
-            <div className="w-12 h-12 rounded-full bg-gradient-to-r from-yellow-500 to-red-500 flex items-center justify-center text-white font-bold text-xl">R</div>
+            <div className="w-12 h-12 rounded-full bg-vibrantOrange flex items-center justify-center text-white font-bold text-xl">R</div>
+            
           </Link>
-          <h2 className="text-3xl font-extrabold text-white">Sign in to your account</h2>
-          <p className="mt-2 text-sm text-gray-400">
+          <h2 className="text-3xl font-extrabold text-vibrantOrange">Sign in to your account</h2>
+          <p className="mt-2 text-sm text-gray-700">
             Welcome back to Ramen Paradise
           </p>
         </div>
@@ -67,7 +68,7 @@ export default function SigninPage() {
 
           {/* Email Input */}
           <div className="space-y-2">
-            <label htmlFor="email" className="block text-sm font-medium text-gray-300">
+            <label htmlFor="email" className="block text-sm font-medium text-black">
               Email Address
             </label>
             <input
@@ -81,7 +82,7 @@ export default function SigninPage() {
                   message: "Please enter a valid email address",
                 },
               })}
-              className={`w-full px-4 py-3 bg-gray-800/60 border ${
+              className={`bg-lightOrange border w-full border-softPeach rounded-lg px-4 py-2 text-deepGreen focus:outline-none focus:ring-2 focus:ring-vibrantOrange focus:border-transparent ${
                 errors.email ? "border-red-500" : "border-gray-700"
               } rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-transparent transition-colors`}
             />
@@ -93,10 +94,10 @@ export default function SigninPage() {
           {/* Password Input */}
           <div className="space-y-2">
             <div className="flex justify-between">
-              <label htmlFor="password" className="block text-sm font-medium text-gray-300">
+              <label htmlFor="password" className="block text-sm font-medium text-black">
                 Password
               </label>
-              <Link to="/auth/forgot-password" className="text-sm text-yellow-400 hover:text-yellow-300">
+              <Link to="/auth/forgot-password" className="text-sm text-vibrantOrange hover:text-vibrantOrange/70">
                 Forgot your password?
               </Link>
             </div>
@@ -107,9 +108,9 @@ export default function SigninPage() {
               {...register("password", {
                 required: "Password is required",
               })}
-              className={`w-full px-4 py-3 bg-gray-800/60 border ${
+              className={`bg-lightOrange border w-full border-softPeach rounded-lg px-4 py-2 text-deepGreen focus:outline-none focus:ring-2 focus:ring-vibrantOrange focus:border-transparent ${
                 errors.password ? "border-red-500" : "border-gray-700"
-              } rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-transparent transition-colors`}
+              } rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:vibrantorange focus:border-transparent transition-colors`}
             />
             {errors.password && (
               <p className="mt-1 text-sm text-red-400">{errors.password.message}</p>
@@ -125,7 +126,7 @@ export default function SigninPage() {
                 {...register("rememberMe")}
                 className="h-4 w-4 bg-gray-800 border-gray-700 rounded focus:ring-yellow-500 text-yellow-500"
               />
-              <label htmlFor="remember-me" className="ml-2 block text-sm text-gray-300">
+              <label htmlFor="remember-me" className="ml-2 block text-sm text-gray-700">
                 Remember me
               </label>
             </div>
@@ -135,7 +136,7 @@ export default function SigninPage() {
           <button
             type="submit"
             disabled={isLoading}
-            className="w-full py-3 bg-gradient-to-r from-yellow-500 to-red-500 hover:from-yellow-600 hover:to-red-600 text-white font-semibold rounded-lg transition duration-300 transform hover:-translate-y-1 disabled:opacity-70 disabled:transform-none"
+            className="w-full py-3 bg-black  text-white font-semibold rounded-lg transition duration-300 transform hover:-translate-y-1 disabled:opacity-70 disabled:transform-none"
           >
             {isLoading ? (
               <span className="flex items-center justify-center">
@@ -151,18 +152,18 @@ export default function SigninPage() {
           </button>
 
           {/* Link to Sign Up */}
-          <div className="text-center text-gray-400">
+          <div className="text-center text-gray-700">
             Don't have an account?{" "}
             <Link
               to="/auth/signup"
-              className="font-medium text-yellow-400 hover:text-yellow-300 transition-colors focus:outline-none"
+              className="font-medium text-vibrantOrange hover:text-text-vibrantOrange/20  transition-colors focus:outline-none"
             >
               Sign up
             </Link>
           </div>
 
           {/* Or continue with social */}
-          <div className="mt-6">
+          {/* <div className="mt-6">
             <div className="relative">
               <div className="absolute inset-0 flex items-center">
                 <div className="w-full border-t border-gray-700"></div>
@@ -192,12 +193,12 @@ export default function SigninPage() {
                 <span className="ml-2">Google</span>
               </button>
             </div>
-          </div>
+          </div> */}
         </form>
         <div className="mt-8 text-center">
           <Link 
               to="/home" 
-              className="text-gray-400 hover:text-white transition-colors duration-300 flex items-center justify-center"
+              className="text-gray-700 hover:text-vibrantOrange  transition-colors duration-300 flex items-center justify-center"
           >
               <svg 
               xmlns="http://www.w3.org/2000/svg" 

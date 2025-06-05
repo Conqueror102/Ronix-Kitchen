@@ -44,11 +44,11 @@ export default function Header() {
             slug: '/location',
             active: true
         },
-        {
-            name: 'Offers',
-            slug: '/offers',
-            active: true
-        },
+        // {
+        //     name: 'Offers',
+        //     slug: '/offers',
+        //     active: true
+        // },
     ]
     
     // Function to check if a nav item is currently active
@@ -102,7 +102,7 @@ export default function Header() {
                         {/* Logo */}
                         <Link to='/home' className="flex items-center">
                             {/* <div className="w-10 h-10 rounded-full bg-gradient-to-r from-yellow-500 to-red-500 flex items-center justify-center text-white font-bold text-xl">R</div> */}
-                            <span className="ml-2 text-xl font-bold bg-clip-text text-transparent bg-vibrantOrange">Ronices Paradise</span>
+                            <span className="ml-2 text-xl font-bold bg-clip-text text-transparent bg-vibrantOrange">Ronix Kitchen</span>
                         </Link>
 
                         {/* Desktop Navigation */}
@@ -115,8 +115,8 @@ export default function Header() {
                                                 onClick={()=> navigate(item.slug)}
                                                 className={`text-center inline-block px-2 py-2 duration-300 rounded-sm
                                                     ${isActiveRoute(item.slug) 
-                                                        ? 'border-b-4  border-black text-yellow-400 font-medium' 
-                                                        : 'hover:bg-gray-400 hover:text-yellow-400'
+                                                        ? 'border-b-4  border-black text-vibrantOrange font-medium' 
+                                                        : ' hover:text-vibrantOrange'
                                                     }`}
                                             >
                                                 {item.name}
@@ -139,20 +139,85 @@ export default function Header() {
                         {/* Action Buttons Group */}
                         <div className="flex items-center gap-2 sm:gap-4">
                             {/* Desktop Cart Button */}
-                            <button 
-                                onClick={() => setIsCartOpen(!isCartOpen)}
-                                className="hidden md:flex items-center space-x-1 py-2 px-3 bg-black hover:bg-black/95 text-gray-300 hover:text-white rounded-lg transition-colors focus:outline-none relative"
-                            >
-                                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
-                                </svg>
-                                <span>Cart</span>
-                                {cart.totalItems > 0 && (
-                                    <span className="flex h-5 w-5 items-center justify-center rounded-full bg-gradient-to-r from-yellow-500 to-red-500 text-white text-xs font-bold ml-1">
-                                        {cart.totalItems}
-                                    </span>
+                            <div className="relative hidden md:block" ref={cartDropdownRef}>
+                                <button 
+                                    onClick={() => setIsCartOpen(!isCartOpen)}
+                                    className="flex items-center space-x-1 py-2 px-3 bg-black hover:bg-black/95 text-gray-300 hover:text-white rounded-lg transition-colors focus:outline-none relative"
+                                >
+                                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
+                                    </svg>
+                                    <span>Cart</span>
+                                    {cart.totalItems > 0 && (
+                                        <span className="flex h-5 w-5 items-center justify-center rounded-full bg-gradient-to-r from-yellow-500 to-red-500 text-white text-xs font-bold ml-1">
+                                            {cart.totalItems}
+                                        </span>
+                                    )}
+                                </button>
+                                {/* Desktop Cart Dropdown */}
+                                {isCartOpen && (
+                                    <div className="absolute right-0 mt-2 w-72 bg-gray-800 rounded-lg shadow-lg py-1 z-10 border border-gray-700">
+                                        <div className="px-4 py-2 border-b border-gray-700">
+                                            <h3 className="text-sm font-medium text-white">Your Cart</h3>
+                                        </div>
+                                        {cart.items.length > 0 ? (
+                                            <>
+                                                <div className="max-h-60 overflow-y-auto">
+                                                    {cart.items.map((item, index) => (
+                                                        <div key={index} className="px-4 py-2 border-b border-gray-700 flex items-center">
+                                                            <div className="h-10 w-10 flex-shrink-0 rounded-md overflow-hidden">
+                                                                <img src={item.image} alt={item.name} className="h-full w-full object-cover" />
+                                                            </div>
+                                                            <div className="ml-3 flex-1">
+                                                                <p className="text-sm font-medium text-white">{item.name}</p>
+                                                                <div className="flex justify-between items-center mt-1">
+                                                                    <p className="text-xs text-gray-400">{item.quantity} × {formatCurrency(item.price)}</p>
+                                                                    <p className="text-xs font-medium text-yellow-400">{formatCurrency(item.price * item.quantity)}</p>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    ))}
+                                                </div>
+                                                
+                                                <div className="px-4 py-2 border-b border-gray-700">
+                                                    <div className="flex justify-between">
+                                                        <p className="text-sm text-gray-300">Subtotal</p>
+                                                        <p className="text-sm font-medium text-white">{formatCurrency(cart.totalPrice)}</p>
+                                                    </div>
+                                                </div>
+                                                
+                                                <div className="px-4 py-3">
+                                                    <button 
+                                                        onClick={() => { navigate('/cart'); setIsCartOpen(false); }}
+                                                        className="w-full bg-gradient-to-r from-yellow-500 to-red-500 hover:from-yellow-600 hover:to-red-600 text-white text-sm font-medium py-2 px-4 rounded-lg transition duration-300"
+                                                    >
+                                                        View Cart
+                                                    </button>
+                                                    <button 
+                                                        onClick={() => { navigate('/checkout'); setIsCartOpen(false); }}
+                                                        className="w-full mt-2 bg-gray-700 hover:bg-gray-600 text-white text-sm font-medium py-2 px-4 rounded-lg transition duration-300"
+                                                    >
+                                                        Checkout
+                                                    </button>
+                                                </div>
+                                            </>
+                                        ) : (
+                                            <div className="px-4 py-6 text-center">
+                                                <svg xmlns="http://www.w3.org/2000/svg" className="h-10 w-10 mx-auto text-gray-500 mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
+                                                </svg>
+                                                <p className="text-sm text-gray-400">Your cart is empty</p>
+                                                <button 
+                                                    onClick={() => { navigate('/menu'); setIsCartOpen(false); }}
+                                                    className="mt-3 text-xs text-yellow-400 hover:text-yellow-300 font-medium transition duration-300"
+                                                >
+                                                    Browse our menu →
+                                                </button>
+                                            </div>
+                                        )}
+                                    </div>
                                 )}
-                            </button>
+                            </div>
                             
                             {/* Mobile Cart Dropdown */}
                             <div className="relative md:hidden" ref={cartDropdownRef}>
@@ -263,7 +328,7 @@ export default function Header() {
                                 
                                 {/* Dropdown menu */}
                                 {isProfileOpen && (
-                                    <div className="absolute right-0 mt-2 w-48 bg-gray-800 rounded-lg shadow-lg py-1 z-10 border border-gray-700">
+                                    <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg py-1 z-10 ">
                                         {status? (
                                             <>
                                                 { user && user.displayName ? 
@@ -285,14 +350,14 @@ export default function Header() {
                                                 </button>
                                                 <button 
                                                     onClick={() => { navigate('/your-orders'); setIsProfileOpen(false); }}
-                                                    className="block w-full text-left px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 hover:text-white"
+                                                    className="block w-full text-left px-4 py-2 text-sm text-vibrantOrange hover:bg-vibrantOrange hover:text-white"
                                                 >
                                                     Your Orders
                                                 </button>
                                                 <div className="border-t border-gray-700 my-1"></div>
                                                 <button 
                                                     onClick={handleLogout}
-                                                    className="block w-full text-left px-4 py-2 text-sm text-red-400 hover:bg-gray-700 hover:text-red-300"
+                                                    className="block w-full text-left px-4 py-2 text-sm text-red-400 hover:bg-vibrantOrange hover:text-red-300"
                                                 >
                                                     Sign out
                                                 </button>
@@ -301,13 +366,13 @@ export default function Header() {
                                             <>
                                                 <button 
                                                     onClick={() => { navigate('/auth/signin'); setIsProfileOpen(false); }}
-                                                    className="block w-full text-left px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 hover:text-white"
+                                                    className="block w-full text-left px-4 py-2 text-sm text-black hover:bg-vibrantOrange hover:text-white"
                                                 >
                                                     Sign in
                                                 </button>
                                                 <button 
                                                     onClick={() => { navigate('/auth/signup'); setIsProfileOpen(false); }}
-                                                    className="block w-full text-left px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 hover:text-white"
+                                                    className="block w-full text-left px-4 py-2 text-sm text-black hover:bg-vibrantOrange hover:text-white"
                                                 >
                                                     Create account
                                                 </button>
