@@ -1,5 +1,5 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import productsService from '../firebase/ProductsService';
+// import productsService from '../firebase/ProductsService';    
 
 // Initial state
 const initialState = {

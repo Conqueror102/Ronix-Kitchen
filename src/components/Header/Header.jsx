@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react'
 import { Link, useNavigate, useLocation } from 'react-router-dom'; // Add useLocation
 import { useDispatch, useSelector } from 'react-redux';
-import authService from '../../firebase/AuthService';
+// import authService from '../../firebase/AuthService';
 import { signout as authSignout} from '../../features/authSlice';
 
 export default function Header() {
@@ -94,7 +94,7 @@ export default function Header() {
     
     return (
         <header className='sticky top-0 z-50 shadow-md backdrop-blur-md bg-white'>
-            <img src="" alt="" />
+            {/* <img src="" alt="" /> */}
             <div className=' text-white py-4 px-6 sm:px-10'>
                 <div className="flex flex-col md:flex-row md:items-center">
                     {/* Top Row - Logo and Action Buttons */}
