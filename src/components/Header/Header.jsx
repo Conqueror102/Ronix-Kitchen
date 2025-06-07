@@ -44,11 +44,11 @@ export default function Header() {
             slug: '/location',
             active: true
         },
-        // {
-        //     name: 'Offers',
-        //     slug: '/offers',
-        //     active: true
-        // },
+        {
+            name: 'About',
+            slug: '/about',
+            active: true
+        },
     ]
     
     // Function to check if a nav item is currently active

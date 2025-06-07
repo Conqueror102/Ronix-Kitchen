@@ -105,7 +105,7 @@ function Services() {
       
       <div className="relative  z-10   mx-auto">
         {/* Services Header */}
-       <div className='bg-lightOrange  px-4 sm:px-6 lg:px-16 py-16'>
+       <div className='bg-softOrange  px-4 sm:px-6 lg:px-16 py-16'>
          <div className="text-center  mb-16">
           <span className="inline-block px-3 py-1 bg-red-600/20 border border-red-500/30 text-red-400 rounded-full text-sm font-medium mb-3">
             What We Offer

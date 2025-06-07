@@ -41,7 +41,7 @@ const LocationHours = ({ navigate }) => {
             
             <button 
               onClick={() => navigate('/location')}
-              className="mt-6 w-full px-4 py-2 bg-deepGreen hover:bg-deepGreen/90 text-white rounded-lg transition duration-300 flex items-center justify-center"
+              className="mt-6 w-full px-4 py-2 bg-black hover:bg-deepGreen/90 text-white rounded-lg transition duration-300 flex items-center justify-center"
             >
               Get Directions
               <ArrowRight className="ml-2 h-4 w-4" />

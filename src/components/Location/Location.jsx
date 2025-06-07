@@ -12,7 +12,7 @@ function Location() {
   ];
 
   return (
-    <div className="bg-lightOrange min-h-screen text-white">
+    <div className="bg-softOrange min-h-screen text-white">
       
       
       <div className="relative z-10 px-4 sm:px-6 lg:px-8 py-16 max-w-7xl mx-auto">
