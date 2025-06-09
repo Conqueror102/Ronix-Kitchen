@@ -2,7 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { Link, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { fetchAllProducts, selectAllProducts } from  '../features/productSlice';
+import { useGetProductsByCategoryQuery } from '../features/RTKQUERY';
+import { selectFilteredProducts, setProducts, filterByCategory } from '../features/productSlice.jsx';
 
 const TOPPINGS = [
   { id: 'extra-chashu', name: 'Extra Chashu', price: 3.50 },
@@ -22,7 +23,18 @@ export default function OrderPage() {
   const dispatch = useDispatch();
   const auth = useSelector((state) => state.auth);
   const user = auth.userData;
-  const productList = useSelector(selectAllProducts);
+  
+  // Get products from RTK Query using the category endpoint
+  const { data: products = [], isLoading: productsLoading } = useGetProductsByCategoryQuery('all');
+  const filteredProducts = useSelector(selectFilteredProducts);
+
+  // Update products in the store when they change
+  useEffect(() => {
+    if (products.length > 0) {
+      dispatch(setProducts(products));
+      dispatch(filterByCategory('all')); // Set initial filtered products
+    }
+  }, [products, dispatch]);
 
   const [categories, setCategories] = useState([]);
   const [categoriesLoading, setCategoriesLoading] = useState(true);
@@ -41,15 +53,6 @@ export default function OrderPage() {
     const fetchCategories = async () => {
       try {
         setCategoriesLoading(true);
-        // Replace with your API call
-        // const categoriesData = await fetch('/api/categories').then(res => res.json());
-        // const activeCategories = categoriesData
-        //   .filter(category => category.active)
-        //   .map(category => ({
-        //     id: category.name.toLowerCase(),
-        //     name: category.name
-        //   }));
-        // setCategories([{ id: 'all', name: 'All Items' }, ...activeCategories]);
         setCategories([
           { id: 'all', name: 'All Items' },
           { id: 'ramen', name: 'Ramen' },
@@ -64,17 +67,20 @@ export default function OrderPage() {
     };
     
     fetchCategories();
-    dispatch(fetchAllProducts());
-  }, [dispatch]);
+  }, []);
 
-  const filteredMenu = productList.filter(item => {
-    const matchesCategory = selectedCategory === 'all' || item.category === selectedCategory;
+  // Update filtered products when category changes
+  useEffect(() => {
+    dispatch(filterByCategory(selectedCategory));
+  }, [selectedCategory, dispatch]);
+
+  const filteredMenu = filteredProducts.filter(item => {
     const matchesSearch = item.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
                         item.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
                         (item.tags && item.tags.some(tag => tag.toLowerCase().includes(searchQuery.toLowerCase())));
     const matchesSpiceLevel = spiceLevelFilter === null || item.spiceLevel === spiceLevelFilter;
     
-    return matchesCategory && matchesSearch && matchesSpiceLevel;
+    return matchesSearch && matchesSpiceLevel;
   });
   
   const addToCart = (menuItem, quantity = 1, selectedToppings = []) => {
@@ -547,226 +553,60 @@ export default function OrderPage() {
                     <div key={`${item.id}-${index}`} className="bg-gray-700 rounded-lg p-3 flex gap-3 relative">
                       <div className="w-16 h-16 rounded-md overflow-hidden flex-shrink-0">
                         <img
-                          src={item.image || `https://source.unsplash.com/100x100/?food,${item.name.toLowerCase()}`}
+                          src={item.image || `https://source.unsplash.com/600x400/?food,${item.name.toLowerCase()}`}
                           alt={item.name}
                           className="w-full h-full object-cover"
+                          loading="lazy"
                         />
                       </div>
-                      
-                      <div className="flex-1">
-                        <div className="flex justify-between">
-                          <h3 className="font-medium text-white text-sm">{item.name}</h3>
-                          <span className="text-yellow-500 font-bold text-sm">${item.totalPrice.toFixed(2)}</span>
+                      <div>
+                        <h3 className="text-lg font-bold text-white">{item.name}</h3>
+                        <p className="text-gray-400 text-sm">{item.description}</p>
+                        <div className="flex flex-wrap gap-2 mt-1">
+                          {item.toppings.map((topping) => (
+                            <span key={topping.id} className="px-2 py-1 text-xs bg-gray-700 rounded-full text-gray-300">
+                              {topping.name}
+                            </span>
+                          ))}
                         </div>
-                        
-                        {item.toppings?.length > 0 && (
-                          <div className="mt-1">
-                            <p className="text-xs text-gray-400">With: {item.toppings.map(t => t.name).join(', ')}</p>
-                          </div>
-                        )}
-                        
-                        <div className="flex justify-between items-center mt-2">
-                          <div className="flex items-center space-x-1 bg-gray-600 rounded-md px-1">
-                            <button
-                              onClick={() => updateCartItemQuantity(index, item.quantity - 1)}
-                              className="w-5 h-5 flex items-center justify-center text-gray-400 hover:text-white"
-                            >
-                              -
-                            </button>
-                            <span className="w-5 text-center text-xs">{item.quantity}</span>
-                            <button
-                              onClick={() => updateCartItemQuantity(index, item.quantity + 1)}
-                              className="w-5 h-5 flex items-center justify-center text-gray-400 hover:text-white"
-                            >
-                              +
-                            </button>
-                          </div>
-                          
-                          <button
-                            onClick={() => removeFromCart(index)}
-                            className="text-red-500 hover:text-red-400"
-                          >
-                            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                            </svg>
-                          </button>
+                        <div className="flex justify-between mt-2">
+                          <span className="text-sm text-gray-400">Quantity: {item.quantity}</span>
+                          <span className="text-sm text-yellow-500">${item.totalPrice.toFixed(2)}</span>
                         </div>
                       </div>
                     </div>
                   ))}
                 </div>
               ) : (
-                <div className="flex flex-col items-center justify-center h-full text-center">
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-12 w-12 text-gray-600 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
-                  </svg>
-                  <h3 className="text-lg font-medium text-gray-300 mb-2">Your cart is empty</h3>
-                  <p className="text-gray-400 text-sm">Add some delicious items to your order!</p>
+                <div className="text-center py-12 bg-gray-800/50 rounded-lg">
+                  <h3 className="text-xl font-medium text-gray-300 mb-2">Your cart is empty</h3>
+                  <p className="text-gray-400 mb-6">Start adding items to your cart</p>
+                  <button
+                    onClick={() => navigate('/')}
+                    className="px-4 py-2 bg-gray-700 hover:bg-gray-600 text-white rounded-md transition-colors inline-flex items-center"
+                  >
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                    </svg>
+                    Go to Menu
+                  </button>
                 </div>
               )}
             </div>
             
-            {/* Checkout Section */}
+            {/* Checkout Button */}
             <div className="p-4 border-t border-gray-700">
-              <div className="flex justify-between mb-4">
-                <span className="text-gray-300">Total:</span>
-                <span className="text-xl font-bold text-yellow-500">${cartTotal.toFixed(2)}</span>
-              </div>
-              
               <button
                 onClick={handleCheckout}
                 disabled={cartItems.length === 0}
-                className={`w-full py-3 text-white font-medium rounded-md transition-colors flex items-center justify-center ${
-                  cartItems.length === 0
-                    ? 'bg-gray-700 cursor-not-allowed'
-                    : 'bg-gradient-to-r from-yellow-500 to-red-500 hover:from-yellow-600 hover:to-red-600'
-                }`}
+                className="w-full bg-gradient-to-r from-yellow-500 to-red-500 text-white py-3 rounded-md transition-colors hover:from-yellow-600 hover:to-red-600"
               >
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
-                </svg>
-                Proceed to Checkout
+                {cartItems.length === 0 ? 'Cart is empty' : 'Proceed to Checkout'}
               </button>
             </div>
           </div>
         </div>
       </div>
-      
-      {/* Mobile Cart Drawer */}
-      <AnimatePresence>
-        {showCart && (
-          <>
-            {/* Backdrop */}
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 0.5 }}
-              exit={{ opacity: 0 }}
-              onClick={() => setShowCart(false)}
-              className="md:hidden fixed inset-0 bg-black z-40"
-            />
-            
-            {/* Drawer */}
-            <motion.div
-              initial={{ x: '100%' }}
-              animate={{ x: 0 }}
-              exit={{ x: '100%' }}
-              transition={{ type: 'tween', ease: 'easeOut', duration: 0.3 }}
-              className="md:hidden fixed right-0 top-0 h-full w-full max-w-xs bg-gray-800 shadow-xl z-50 flex flex-col"
-            >
-              <div className="p-4 border-b border-gray-700 flex justify-between items-center">
-                <h2 className="text-xl font-bold text-white">Your Order</h2>
-                <button
-                  onClick={() => setShowCart(false)}
-                  className="p-1 rounded-full hover:bg-gray-700 transition-colors"
-                >
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                  </svg>
-                </button>
-              </div>
-              
-              {/* Cart Items - with hidden scrollbar */}
-              <div 
-                className="flex-1 overflow-y-auto p-4 hide-scrollbar" 
-                style={hideScrollbarStyle}
-              >
-                {cartItems.length > 0 ? (
-                  <div className="space-y-4">
-                    {cartItems.map((item, index) => (
-                      <div key={`${item.id}-${index}`} className="bg-gray-700 rounded-lg p-3 flex gap-3 relative">
-                        <div className="w-16 h-16 rounded-md overflow-hidden flex-shrink-0">
-                          <img
-                            src={item.image || `https://source.unsplash.com/100x100/?food,${item.name.toLowerCase()}`}
-                            alt={item.name}
-                            className="w-full h-full object-cover"
-                          />
-                        </div>
-                        
-                        <div className="flex-1">
-                          <div className="flex justify-between">
-                            <h3 className="font-medium text-white text-sm">{item.name}</h3>
-                            <span className="text-yellow-500 font-bold">${item.totalPrice.toFixed(2)}</span>
-                          </div>
-                          
-                          {item.toppings?.length > 0 && (
-                            <div className="mt-1">
-                              <p className="text-xs text-gray-400">With: {item.toppings.map(t => t.name).join(', ')}</p>
-                            </div>
-                          )}
-                          
-                          <div className="flex justify-between items-center mt-2">
-                            <div className="flex items-center space-x-1 bg-gray-600 rounded-md px-1">
-                              <button
-                                onClick={() => updateCartItemQuantity(index, item.quantity - 1)}
-                                className="w-5 h-5 flex items-center justify-center text-gray-400 hover:text-white"
-                              >
-                                -
-                              </button>
-                              <span className="w-5 text-center text-xs">{item.quantity}</span>
-                              <button
-                                onClick={() => updateCartItemQuantity(index, item.quantity + 1)}
-                                className="w-5 h-5 flex items-center justify-center text-gray-400 hover:text-white"
-                              >
-                                +
-                              </button>
-                            </div>
-                            
-                            <button
-                              onClick={() => removeFromCart(index)}
-                              className="text-red-500 hover:text-red-400"
-                            >
-                              <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                              </svg>
-                            </button>
-                          </div>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                ) : (
-                  <div className="flex flex-col items-center justify-center h-full text-center">
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-12 w-12 text-gray-600 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
-                    </svg>
-                    <h3 className="text-lg font-medium text-gray-300 mb-2">Your cart is empty</h3>
-                    <p className="text-gray-400 text-sm mb-6">Add some delicious items to your order!</p>
-                    <button
-                      onClick={() => setShowCart(false)}
-                      className="px-4 py-2 bg-gray-700 hover:bg-gray-600 text-white rounded-md transition-colors"
-                    >
-                      Browse Menu
-                    </button>
-                  </div>
-                )}
-              </div>
-              
-              {/* Checkout Section - Same as desktop version */}
-              <div className="p-4 border-t border-gray-700">
-                <div className="flex justify-between mb-4">
-                  <span className="text-gray-300">Total:</span>
-                  <span className="text-xl font-bold text-yellow-500">${cartTotal.toFixed(2)}</span>
-                </div>
-                
-                <button
-                  onClick={handleCheckout}
-                  disabled={cartItems.length === 0}
-                  className={`w-full py-3 text-white font-medium rounded-md transition-colors flex items-center justify-center ${
-                    cartItems.length === 0
-                      ? 'bg-gray-700 cursor-not-allowed'
-                      : 'bg-gradient-to-r from-yellow-500 to-red-500 hover:from-yellow-600 hover:to-red-600'
-                  }`}
-                >
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
-                  </svg>
-                  Proceed to Checkout
-                </button>
-              </div>
-            </motion.div>
-          </>
-        )}
-      </AnimatePresence>
     </div>
   );
 }

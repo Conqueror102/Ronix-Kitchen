@@ -1,76 +1,81 @@
 import React, { useState } from "react";
-import { useDispatch } from "react-redux";
-// import authService from "../firebase/AuthService";
 import { useNavigate, Link } from "react-router-dom";
 import { useForm } from "react-hook-form";
-import { signin } from "../features/authSlice";
+import { useAuth } from "../features/useAuth";
+import { useSelector } from "react-redux";
+import { selectAuthError, selectAuthLoading } from "../features/authSlice";
 
 export default function SignupPage() {
   const navigate = useNavigate();
-  const dispatch = useDispatch();
-  const [error, setError] = useState(null);
-  const [isLoading, setIsLoading] = useState(false);
+  const { signup } = useAuth();
+  const error = useSelector(selectAuthError);
+  const isLoading = useSelector(selectAuthLoading);
   const { register, handleSubmit, formState: { errors }, watch } = useForm();
-  const password = watch("password", "");
+  const password = watch("password");
+  const [successMessage, setSuccessMessage] = useState("");
 
-  const create = async (data) => {
-    setError("");
-    setIsLoading(true);
-
-    if (data.password !== data.confirmPassword) {
-      setError("Passwords do not match");
-      setIsLoading(false);
-      return;
-    }
-
+  const onSubmit = async (data) => {
     try {
-      // Example: Replace with your backend API call
-      // const response = await fetch('/api/auth/signup', {
-      //   method: 'POST',
-      //   headers: { 'Content-Type': 'application/json' },
-      //   body: JSON.stringify(data)
-      // });
-      // const userData = await response.json();
-      // if (!userData.success) throw new Error(userData.message || "Failed to sign up.");
-      // dispatch(signin(userData));
-      // navigate("/home");
-
-      // Simulate user data for UI
-      const userData = {
-        id: "demo-user-id",
-        name: data.email.split("@")[0],
-        email: data.email,
-        token: "demo-token"
-      };
-      dispatch(signin(userData));
-      navigate("/home");
+      setSuccessMessage("Account created successfully! Logging you in...");
+      await signup(data);
     } catch (error) {
-      setError(error.message || "Failed to sign up. Please try again.");
-    } finally {
-      setIsLoading(false);
+      setSuccessMessage("");
+      console.error('Signup error:', error);
     }
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-white py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-md w-full bg-white backdrop-blur-sm rounded-xl border border-gray-200 shadow-md p-8">
+    <div className="min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+      <div className="max-w-md w-full border border-gray-100 bg-white rounded-xl shadow-lg p-8">
         <div className="text-center">
           <Link to="/" className="flex items-center justify-center mb-6">
             <div className="w-12 h-12 rounded-full bg-vibrantOrange flex items-center justify-center text-white font-bold text-xl">R</div>
           </Link>
           <h2 className="text-3xl font-extrabold text-vibrantOrange">Create your account</h2>
           <p className="mt-2 text-sm text-gray-700">
-            Join Ramen Paradise to order delicious ramen and get exclusive offers
+            Join Ramen Paradise today
           </p>
         </div>
 
-        <form className="mt-8 space-y-5" onSubmit={handleSubmit(create)}>
+        <form className="mt-8 space-y-5" onSubmit={handleSubmit(onSubmit)}>
+          {/* Show success message if exists */}
+          {successMessage && (
+            <div className="p-3 rounded-lg bg-green-100 border border-green-400 text-green-700 text-sm font-medium">
+              {successMessage}
+            </div>
+          )}
+
           {/* Show error message if exists */}
           {error && (
-            <div className="p-3 rounded-lg bg-red-500/20 border border-red-500/30 text-red-200 text-sm">
+            <div className="p-3 rounded-lg bg-red-100 border border-red-400 text-red-700 text-sm font-medium">
               {error}
             </div>
           )}
+
+          {/* Name Input */}
+          <div className="space-y-2">
+            <label htmlFor="name" className="block text-sm font-medium text-black">
+              Full Name
+            </label>
+            <input
+              id="name"
+              type="text"
+              placeholder="John Doe"
+              {...register("name", {
+                required: "Name is required",
+                minLength: {
+                  value: 2,
+                  message: "Name must be at least 2 characters"
+                }
+              })}
+              className={`bg-lightOrange border w-full border-softPeach rounded-lg px-4 py-2 text-black focus:outline-none focus:ring-2 focus:ring-vibrantOrange focus:border-transparent ${
+                errors.name ? "border-red-500" : "border-gray-300"
+              }`}
+            />
+            {errors.name && (
+              <p className="mt-1 text-sm text-red-600 font-medium">{errors.name.message}</p>
+            )}
+          </div>
 
           {/* Email Input */}
           <div className="space-y-2">
@@ -81,7 +86,6 @@ export default function SignupPage() {
               id="email"
               type="email"
               placeholder="your@email.com"
-              autoComplete="off"
               {...register("email", {
                 required: "Email is required",
                 pattern: {
@@ -89,12 +93,37 @@ export default function SignupPage() {
                   message: "Please enter a valid email address",
                 },
               })}
-              className={`bg-lightOrange border w-full border-softPeach rounded-lg px-4 py-2 text-deepGreen focus:outline-none focus:ring-2 focus:ring-vibrantOrange focus:border-transparent  ${
-                errors.email ? "border-red-500" : "border-gray-700"
-              } rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-transparent transition-colors`}
+              className={`bg-lightOrange border w-full border-softPeach rounded-lg px-4 py-2 text-black focus:outline-none focus:ring-2 focus:ring-vibrantOrange focus:border-transparent ${
+                errors.email ? "border-red-500" : "border-gray-300"
+              }`}
             />
             {errors.email && (
-              <p className="mt-1 text-sm text-red-400">{errors.email.message}</p>
+              <p className="mt-1 text-sm text-red-600 font-medium">{errors.email.message}</p>
+            )}
+          </div>
+
+          {/* Phone Number Input */}
+          <div className="space-y-2">
+            <label htmlFor="phoneNumber" className="block text-sm font-medium text-black">
+              Phone Number
+            </label>
+            <input
+              id="phoneNumber"
+              type="tel"
+              placeholder="+1234567890"
+              {...register("phoneNumber", {
+                required: "Phone number is required",
+                pattern: {
+                  value: /^\+?[1-9]\d{1,14}$/,
+                  message: "Please enter a valid phone number"
+                }
+              })}
+              className={`bg-lightOrange border w-full border-softPeach rounded-lg px-4 py-2 text-black focus:outline-none focus:ring-2 focus:ring-vibrantOrange focus:border-transparent ${
+                errors.phoneNumber ? "border-red-500" : "border-gray-300"
+              }`}
+            />
+            {errors.phoneNumber && (
+              <p className="mt-1 text-sm text-red-600 font-medium">{errors.phoneNumber.message}</p>
             )}
           </div>
 
@@ -107,20 +136,19 @@ export default function SignupPage() {
               id="password"
               type="password"
               placeholder="••••••••"
-              autoComplete="new-password"
               {...register("password", {
                 required: "Password is required",
                 minLength: {
                   value: 6,
-                  message: "Password must be at least 6 characters",
-                },
+                  message: "Password must be at least 6 characters"
+                }
               })}
-              className={`bg-lightOrange border w-full border-softPeach rounded-lg px-4 py-2 text-deepGreen focus:outline-none focus:ring-2 focus:ring-vibrantOrange focus:border-transparent ${
-                errors.password ? "border-red-500" : "border-gray-700"
-              } rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-transparent transition-colors`}
+              className={`bg-lightOrange border w-full border-softPeach rounded-lg px-4 py-2 text-black focus:outline-none focus:ring-2 focus:ring-vibrantOrange focus:border-transparent ${
+                errors.password ? "border-red-500" : "border-gray-300"
+              }`}
             />
             {errors.password && (
-              <p className="mt-1 text-sm text-red-400">{errors.password.message}</p>
+              <p className="mt-1 text-sm text-red-600 font-medium">{errors.password.message}</p>
             )}
           </div>
 
@@ -133,45 +161,24 @@ export default function SignupPage() {
               id="confirmPassword"
               type="password"
               placeholder="••••••••"
-              autoComplete="new-password"
               {...register("confirmPassword", {
                 required: "Please confirm your password",
                 validate: value => value === password || "Passwords do not match"
               })}
-              className={`bg-lightOrange border w-full border-softPeach rounded-lg px-4 py-2 text-deepGreen focus:outline-none focus:ring-2 focus:ring-vibrantOrange focus:border-transparent  ${
-                errors.confirmPassword ? "border-red-500" : "border-gray-700"
-              } rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-transparent transition-colors`}
+              className={`bg-lightOrange border w-full border-softPeach rounded-lg px-4 py-2 text-black focus:outline-none focus:ring-2 focus:ring-vibrantOrange focus:border-transparent ${
+                errors.confirmPassword ? "border-red-500" : "border-gray-300"
+              }`}
             />
             {errors.confirmPassword && (
-              <p className="mt-1 text-sm text-red-400">{errors.confirmPassword.message}</p>
+              <p className="mt-1 text-sm text-red-600 font-medium">{errors.confirmPassword.message}</p>
             )}
           </div>
-
-          {/* Terms Agreement Checkbox */}
-          {/* <div className="flex items-start">
-            <div className="flex items-center h-5">
-              <input
-                id="terms"
-                type="checkbox"
-                {...register("terms", { required: "You must agree to the Terms and Conditions" })}
-                className="h-5 w-5 bg-gray-800 border-gray-700 rounded focus:ring-yellow-500 text-yellow-500"
-              />
-            </div>
-            <div className="ml-3 text-sm">
-              <label htmlFor="terms" className="text-gray-300">
-                I agree to the <a href="#" className="text-yellow-400 hover:text-yellow-300">Terms and Conditions</a>
-              </label>
-              {errors.terms && (
-                <p className="mt-1 text-sm text-red-400">{errors.terms.message}</p>
-              )}
-            </div>
-          </div> */}
 
           {/* Submit Button */}
           <button
             type="submit"
             disabled={isLoading}
-            className="w-full py-3 bg-black hover:bg-black/80 text-white font-semibold rounded-lg transition duration-300 transform hover:-translate-y-1 disabled:opacity-70 disabled:transform-none"
+            className="w-full py-3 bg-black text-white font-semibold rounded-lg transition duration-300 transform hover:-translate-y-1 disabled:opacity-70 disabled:transform-none"
           >
             {isLoading ? (
               <span className="flex items-center justify-center">
@@ -191,49 +198,16 @@ export default function SignupPage() {
             Already have an account?{" "}
             <Link
               to="/auth/signin"
-              className="font-medium text-vibrantOrange hover:text-yellow-300 transition-colors focus:outline-none"
+              className="font-medium text-vibrantOrange hover:text-text-vibrantOrange/20 transition-colors focus:outline-none"
             >
               Sign in
             </Link>
           </div>
-
-          {/* Or continue with social */}
-          {/* <div className="mt-6">
-            <div className="relative">
-              <div className="absolute inset-0 flex items-center">
-                <div className="w-full border-t border-gray-700"></div>
-              </div>
-              <div className="relative flex justify-center text-sm">
-                <span className="px-2 bg-gray-800 text-gray-400">Or continue with</span>
-              </div>
-            </div>
-
-            <div className="mt-6 grid grid-cols-2 gap-3">
-              <button
-                type="button"
-                className="w-full inline-flex justify-center py-2 px-4 border border-gray-700 rounded-lg shadow-sm bg-gray-800 text-sm font-medium text-gray-300 hover:bg-gray-700"
-              >
-                <svg className="h-5 w-5" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                  <path d="M22.675 0h-21.35c-.732 0-1.325.593-1.325 1.325v21.351c0 .731.593 1.324 1.325 1.324h11.495v-9.294h-3.128v-3.622h3.128v-2.671c0-3.1 1.893-4.788 4.659-4.788 1.325 0 2.463.099 2.794.143v3.24l-1.918.001c-1.504 0-1.795.715-1.795 1.763v2.313h3.587l-.467 3.622h-3.12v9.293h6.116c.73 0 1.323-.593 1.323-1.325v-21.35c0-.732-.593-1.325-1.325-1.325z" />
-                </svg>
-                <span className="ml-2">Facebook</span>
-              </button>
-              <button
-                type="button"
-                className="w-full inline-flex justify-center py-2 px-4 border border-gray-700 rounded-lg shadow-sm bg-gray-800 text-sm font-medium text-gray-300 hover:bg-gray-700"
-              >
-                <svg className="w-5 h-5 mr-2" viewBox="0 0 24 24" fill="currentColor">
-                  <path d="M12.545 10.239v3.821h5.445c-0.712 2.315-2.647 3.972-5.445 3.972-3.332 0-6.033-2.701-6.033-6.032s2.701-6.032 6.033-6.032c1.498 0 2.866 0.549 3.921 1.453l2.814-2.814c-1.798-1.677-4.203-2.701-6.735-2.701-5.552 0-10.054 4.502-10.054 10.054s4.502 10.054 10.054 10.054c8.396 0 10.054-7.629 10.054-10.053 0-0.672-0.057-1.32-0.163-1.944h-9.891z" />
-                </svg>
-                <span className="ml-2">Google</span>
-              </button>
-            </div>
-          </div> */}
         </form>
         <div className="mt-8 text-center">
           <Link 
             to="/home" 
-            className="text-gray-500 hover:text-black transition-colors duration-300 flex items-center justify-center"
+            className="text-gray-700 hover:text-vibrantOrange transition-colors duration-300 flex items-center justify-center"
           >
             <svg 
               xmlns="http://www.w3.org/2000/svg" 
