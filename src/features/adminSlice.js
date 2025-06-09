@@ -2,43 +2,47 @@ import { createSlice } from '@reduxjs/toolkit';
 
 const initialState = {
   status: false,
-  adminName: null,
-  adminEmail: null,
-  adminPermissions: {
-    READ: false,
-    WRITE: false,
-    DELETE: false,
-    UPDATE: false,
-  },
-  adminId: null,
+  adminData: null,
+  error: null,
+  loading: false
 };
 
 const adminSlice = createSlice({
   name: 'admin',
   initialState,
   reducers: {
-    signin: (state, action) => {
+    setAdminCredentials: (state, action) => {
       state.status = true;
-      state.adminName = action.payload.adminName;
-      state.adminEmail = action.payload.adminEmail;
-      state.adminPermissions = action.payload.adminPermissions || state.adminPermissions;
-      state.adminId = action.payload.adminId;
+      state.adminData = action.payload;
+      state.error = null;
     },
-    signout: (state) => {
+    setAdminError: (state, action) => {
+      state.error = action.payload;
+      state.loading = false;
+    },
+    setAdminLoading: (state, action) => {
+      state.loading = action.payload;
+    },
+    adminLogout: (state) => {
       state.status = false;
-      state.adminName = null;
-      state.adminEmail = null;
-      state.adminPermissions = {
-        READ: false,
-        WRITE: false,
-        DELETE: false,
-        UPDATE: false,
-      };
-      state.adminId = null;
-    },
-  },
+      state.adminData = null;
+      state.error = null;
+    }
+  }
 });
 
-export const { signin, signout } = adminSlice.actions;
+export const { 
+  setAdminCredentials, 
+  setAdminError, 
+  setAdminLoading, 
+  adminLogout 
+} = adminSlice.actions;
+
+// Selectors
+export const selectAdminStatus = (state) => state.admin.status;
+export const selectAdminData = (state) => state.admin.adminData;
+export const selectAdminError = (state) => state.admin.error;
+export const selectAdminLoading = (state) => state.admin.loading;
+export const selectIsAdmin = (state) => state.admin.status;
 
 export default adminSlice.reducer;

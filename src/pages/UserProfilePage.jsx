@@ -4,14 +4,13 @@ import { Link, useNavigate } from 'react-router-dom';
 // import authService from '../firebase/AuthService';
 import { useForm, Controller } from 'react-hook-form';
 // import userService from '../firebase/UserService';
-import { signin } from '../features/authSlice';
+import { setCredentials, selectCurrentUser } from '../features/authSlice';
 
 export default function UserProfilePage() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   
-  const auth = useSelector((state) => state.auth);
-  const user = auth.userData;
+  const user = useSelector(selectCurrentUser);
   
   const fileInputRef = useRef(null);
   const [imageFile, setImageFile] = useState(null);
@@ -182,10 +181,10 @@ export default function UserProfilePage() {
         favorite: selectedFavorites
       };
       
-      if (userData.uid) {
+      if (user?.id) {
         // Replace with your backend update logic
         setUserData({ ...userData, ...updatedData });
-        dispatch(signin({ ...userData, ...updatedData }))
+        dispatch(setCredentials({ user: { ...userData, ...updatedData }, token: user.token }));
         alert("Profile updated successfully!");
       } else {
         throw new Error("User ID not found.");
@@ -292,19 +291,7 @@ export default function UserProfilePage() {
     </div>
   );
 
-  if (!auth.status || auth.status === 'loading') {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-900">
-        <div className="animate-pulse flex flex-col items-center">
-          <div className="w-32 h-32 bg-gray-700 rounded-full mb-6"></div>
-          <div className="h-8 bg-gray-700 rounded w-64 mb-4"></div>
-          <div className="h-4 bg-gray-700 rounded w-48"></div>
-        </div>
-      </div>
-    );
-  }
-
-  if (!user && auth.status === false) {
+  if (!user && !user?.token) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-900">
         <div className="max-w-md w-full bg-gray-800/50 backdrop-blur-sm rounded-xl border border-gray-700 shadow-xl p-8 text-center">

@@ -1,117 +1,38 @@
 import React, { useState } from 'react';
-import Header from '../Header/Header';
-import Footer from '../Footer/Footer';
+import { useDispatch, useSelector } from 'react-redux';
+import { useGetAllProductsQuery } from '../../features/RTKQUERY';
+import { addToCart } from '../../features/cartSlice';
+import { selectIsAuthenticated } from '../../features/authSlice';
+// import Header from '../Header/Header';
+// import Footer from '../Footer/Footer';
 
 function Menu() {
-  const [activeCategory, setActiveCategory] = useState('ramen');
+  const [activeCategory, setActiveCategory] = useState('all');
+  const dispatch = useDispatch();
+  const isAuthenticated = useSelector(selectIsAuthenticated);
+  const { data: products = [], isLoading, isError } = useGetAllProductsQuery();
 
-  // Menu categories
+  // Extract unique categories from products
   const categories = [
-    { id: 'ramen', name: 'Ramen' },
-    { id: 'sides', name: 'Side Dishes' },
-    { id: 'beverages', name: 'Beverages' },
-    { id: 'desserts', name: 'Desserts' }
+    { id: 'all', name: 'All' },
+    ...Array.from(new Set(products.map(p => p.category))).map(cat => ({ id: cat, name: cat }))
   ];
 
-  // Menu items by category
-  const menuItems = {
-    ramen: [
-      {
-        id: 1,
-        name: 'Tonkotsu Ramen',
-        description: 'Rich pork bone broth simmered for 24 hours, topped with char siu, soft-boiled egg, green onions, and nori.',
-        price: 14.99,
-        image: 'https://images.unsplash.com/photo-1617196034183-421b4917c92d',
-        tags: ['Popular', 'Signature']
-      },
-      {
-        id: 2,
-        name: 'Spicy Miso Ramen',
-        description: 'Savory miso broth with chili oil, tender pork belly, bean sprouts, corn, and ajitama egg.',
-        price: 15.99,
-        image: 'https://images.unsplash.com/photo-1569718212165-3a8278d5f624',
-        tags: ['Spicy']
-      },
-      {
-        id: 3,
-        name: 'Shoyu Ramen',
-        description: 'Light soy sauce-based broth with chashu pork, menma, and seasonal vegetables.',
-        price: 13.99,
-        image: 'https://images.unsplash.com/photo-1557872943-16a5ac26437e',
-        tags: []
-      },
-      {
-        id: 4,
-        name: 'Vegetable Ramen',
-        description: 'Kombu and shiitake mushroom broth with tofu, seasonal vegetables, and plant-based noodles.',
-        price: 12.99,
-        image: 'https://images.unsplash.com/photo-1591814468924-caf88d1232e1',
-        tags: ['Vegetarian']
-      },
-    ],
-    sides: [
-      {
-        id: 5,
-        name: 'Gyoza',
-        description: 'Pan-fried dumplings filled with seasoned pork and vegetables (6 pieces).',
-        price: 6.99,
-        image: 'https://images.unsplash.com/photo-1496116218417-1a781b1c416c',
-        tags: ['Popular']
-      },
-      {
-        id: 6,
-        name: 'Takoyaki',
-        description: 'Octopus-filled battered balls topped with takoyaki sauce and bonito flakes.',
-        price: 7.99,
-        image: 'https://images.unsplash.com/photo-1511689660979-10d2b1aada96',
-        tags: []
-      },
-    ],
-    beverages: [
-      {
-        id: 7,
-        name: 'Japanese Beer',
-        description: 'Asahi, Sapporo, or Kirin (12 oz bottle).',
-        price: 5.99,
-        image: 'https://images.unsplash.com/photo-1603824255830-9514f964d7f6',
-        tags: []
-      },
-      {
-        id: 8,
-        name: 'Green Tea',
-        description: 'Traditional Japanese green tea, hot or iced.',
-        price: 2.99,
-        image: 'https://images.unsplash.com/photo-1564890369478-c89ca6d9cde9',
-        tags: []
-      },
-    ],
-    desserts: [
-      {
-        id: 9,
-        name: 'Matcha Mochi Ice Cream',
-        description: 'Green tea ice cream wrapped in a sweet rice dough.',
-        price: 4.99,
-        image: 'https://images.unsplash.com/photo-1561845730-208ad5910553',
-        tags: ['Popular']
-      },
-      {
-        id: 10,
-        name: 'Taiyaki',
-        description: 'Fish-shaped cake filled with sweet red bean paste.',
-        price: 3.99,
-        image: 'https://images.unsplash.com/photo-1558326218-1e0ead4a2b81',
-        tags: []
-      },
-    ]
+  // Filter products by category
+  const filteredProducts = activeCategory === 'all'
+    ? products
+    : products.filter(p => p.category === activeCategory);
+
+  const handleAddToCart = (product) => {
+    if (!isAuthenticated) {
+      alert('Please sign in to add items to your cart.');
+      return;
+    }
+    dispatch(addToCart(product));
   };
 
   return (
     <div className="bg-softOrange min-h-screen flex flex-col">
-      {/* Header */}
-      {/* <Header /> */}
-      
-    
-      
       {/* Main menu content */}
       <main className="flex-grow px-4 sm:px-6 lg:px-8 py-16 relative z-10">
         <div className="max-w-7xl mx-auto">
@@ -125,7 +46,7 @@ function Menu() {
             </h1>
             <div className="w-24 h-1 bg-vibrantOrange mx-auto mt-4"></div>
           </div>
-          
+
           {/* Category Navigation */}
           <div className="flex flex-wrap justify-center mb-10 gap-2">
             {categories.map(category => (
@@ -142,10 +63,14 @@ function Menu() {
               </button>
             ))}
           </div>
-          
+
+          {/* Loading/Error States */}
+          {isLoading && <div className="text-center text-lg text-gray-500">Loading menu...</div>}
+          {isError && <div className="text-center text-lg text-red-500">Failed to load menu. Please try again later.</div>}
+
           {/* Menu Items Grid */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6 sm:gap-8">
-            {menuItems[activeCategory].map((item) => (
+            {filteredProducts.map((item) => (
               <div 
                 key={item.id}
                 className="bg-white rounded-xl overflow-hidden  shadow-lg flex flex-col sm:flex-row hover:shadow-xl transition duration-300"
@@ -158,7 +83,7 @@ function Menu() {
                     className="w-full h-full object-cover object-center"
                     style={{ height: '100%', minHeight: '140px' }}
                   />
-                  {item.tags.length > 0 && (
+                  {item.tags && item.tags.length > 0 && (
                     <div className="absolute top-2 left-2 flex flex-wrap gap-1">
                       {item.tags.map((tag, index) => (
                         <span 
@@ -185,8 +110,13 @@ function Menu() {
                     <p className="text-gray-400 text-sm mb-4">{item.description}</p>
                   </div>
                   <div className="flex justify-between items-center mt-auto">
-                    <span className="text-vibrantOrange font-bold">${item.price.toFixed(2)}</span>
-                    <button className="bg-black text-white text-sm font-bold py-1.5 px-4 rounded-lg hover:bg-black/90 cursor-pointer transition">
+                    <span className="text-vibrantOrange font-bold">${item.price?.toFixed(2)}</span>
+                    <button
+                      className="bg-black text-white text-sm font-bold py-1.5 px-4 rounded-lg hover:bg-black/90 cursor-pointer transition"
+                      onClick={() => handleAddToCart(item)}
+                      disabled={!isAuthenticated}
+                      title={!isAuthenticated ? 'Sign in to order' : ''}
+                    >
                       Add to Order
                     </button>
                   </div>
@@ -196,9 +126,6 @@ function Menu() {
           </div>
         </div>
       </main>
-      
-      {/* Footer */}
-      {/* <Footer /> */}
     </div>
   );
 }

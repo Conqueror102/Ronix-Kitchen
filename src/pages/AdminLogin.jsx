@@ -1,8 +1,9 @@
-import React, { useEffect } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import React from 'react';
 import { useNavigate, useLocation, Link } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
-import { signin as adminSignin } from '../features/adminSlice';
+import { useAdminAuth } from '../features/useAdminAuth';
+import { useSelector } from 'react-redux';
+import { selectAdminStatus } from '../features/adminSlice';
 
 export default function AdminLogin() {
   const { 
@@ -17,45 +18,30 @@ export default function AdminLogin() {
   });
   
   const [error, setError] = React.useState(null);
+  const [successMessage, setSuccessMessage] = React.useState('');
   
-  const dispatch = useDispatch();
   const navigate = useNavigate();
   const location = useLocation();
-  const adminAuth = useSelector(state => state.admin);
+  const isAuthenticated = useSelector(selectAdminStatus);
+  const { login } = useAdminAuth();
   
   const from = location.state?.from || '/admin/dashboard';
   
-  useEffect(() => {
-    if (adminAuth.status) {
+  React.useEffect(() => {
+    if (isAuthenticated) {
       navigate(from, { replace: true });
     }
-  }, [adminAuth.status, navigate, from]);
+  }, [isAuthenticated, navigate, from]);
 
   const onSubmit = async (data) => {
     setError(null);
+    setSuccessMessage('');
 
     try {
-      // Simulate admin data for UI
-      const result = {
-        adminId: 'demo-admin-id',
-        adminName: 'Admin User',
-        adminEmail: data.email,
-        adminPermissions: {
-          READ: true,
-          WRITE: true,
-          DELETE: true,
-          UPDATE: true
-        }
-      };
-
-      dispatch(adminSignin(result));
-      localStorage.setItem('adminAuth', JSON.stringify({
-        adminId: result.adminId,
-        timestamp: Date.now()
-      }));
-      navigate(from, { replace: true });
+      await login(data);
+      setSuccessMessage('Login successful! Redirecting...');
     } catch (err) {
-      setError(err.message || 'Failed to login. Please check your credentials.');
+      setError(err.data?.message || 'Failed to login. Please check your credentials.');
       console.error('Login error:', err);
     }
   };
@@ -84,8 +70,14 @@ export default function AdminLogin() {
             </p>
           </div>
           
+          {successMessage && (
+            <div className="mb-6 p-3 rounded-lg bg-green-100 border border-green-400 text-green-700 text-sm font-medium">
+              {successMessage}
+            </div>
+          )}
+          
           {error && (
-            <div className="mb-6 p-3 rounded-lg bg-red-500/20 border border-red-500/30 text-red-400">
+            <div className="mb-6 p-3 rounded-lg bg-red-100 border border-red-400 text-red-700 text-sm font-medium">
               {error}
             </div>
           )}
@@ -109,7 +101,7 @@ export default function AdminLogin() {
                 })}
               />
               {errors.email && (
-                <p className="mt-1 text-sm text-red-400">{errors.email.message}</p>
+                <p className="mt-1 text-sm text-red-600 font-medium">{errors.email.message}</p>
               )}
             </div>
             
@@ -134,7 +126,7 @@ export default function AdminLogin() {
                 })}
               />
               {errors.password && (
-                <p className="mt-1 text-sm text-red-400">{errors.password.message}</p>
+                <p className="mt-1 text-sm text-red-600 font-medium">{errors.password.message}</p>
               )}
             </div>
             
@@ -154,11 +146,8 @@ export default function AdminLogin() {
           </form>
           
           <div className="mt-6 text-center text-sm">
-            <Link to="/" className="text-vibrantOrange hover:text-vibrantOrange/70 font-medium inline-flex items-center">
-              <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-              </svg>
-              Back to website
+            <Link to="/admin/signup" className="text-vibrantOrange hover:text-vibrantOrange/70 font-medium">
+              Need an admin account? Sign up
             </Link>
           </div>
         </div>

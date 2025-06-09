@@ -176,12 +176,20 @@ const customerIcons = [
 export default function AboutPage() {
   return (
     <div className="min-h-screen bg-background">
-      {/* Hero Section */}
-      <section className="relative py-20 px-4 bg-gradient-to-br from-orange-50 to-red-50">
-        <div className="max-w-6xl mx-auto text-center">
+      {/* Hero Section with Background Image */}
+      <section
+        className="relative py-20 px-4 bg-gradient-to-br from-orange-50 to-red-50"
+        style={{
+          backgroundImage: "url('/about-hero.webp')",
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+        }}
+      >
+        <div className="absolute inset-0 bg-black/40"></div>
+        <div className="relative max-w-6xl mx-auto text-center text-white">
           <Badge className="mb-4 bg-orange-100 text-orange-800 hover:bg-orange-200">Our Story</Badge>
-          <h1 className="text-4xl md:text-6xl font-bold text-gray-900 mb-6">About Ronix Spices </h1>
-          <p className="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
+          <h1 className="text-4xl md:text-6xl font-bold mb-6">About Ronix Spices </h1>
+          <p className="text-xl max-w-3xl mx-auto leading-relaxed">
             Where authentic Italian flavors meet modern culinary artistry. A family tradition spanning three
             generations, bringing you the finest dining experience.
           </p>
