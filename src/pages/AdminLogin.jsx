@@ -82,7 +82,7 @@ export default function AdminLogin() {
             </div>
           )}
           
-          <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+          <form className="mt-8 space-y-5" onSubmit={handleSubmit(onSubmit)}>
             <div>
               <label htmlFor="email" className="block text-sm font-medium text-black mb-1">
                 Email
@@ -146,8 +146,11 @@ export default function AdminLogin() {
           </form>
           
           <div className="mt-6 text-center text-sm">
-            <Link to="/admin/signup" className="text-vibrantOrange hover:text-vibrantOrange/70 font-medium">
-              Need an admin account? Sign up
+            <Link to="/" className="text-vibrantOrange hover:text-vibrantOrange/70 font-medium inline-flex items-center">
+              <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+              </svg>
+              Back to website
             </Link>
           </div>
         </div>
