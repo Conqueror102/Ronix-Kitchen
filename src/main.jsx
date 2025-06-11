@@ -8,7 +8,6 @@ import { PersistGate } from 'redux-persist/integration/react'
 import store, { persistor } from './Store/store'
 import AdminPage from './pages/AdminPage'
 import AdminLogin from './pages/AdminLogin'
-import AdminSignup from './pages/AdminSignup'
 import ProtectedRoute from './components/ProtectedRoute'
 import {
   Home,
@@ -68,7 +67,6 @@ const router = createBrowserRouter([
         path: 'about',
         element: <About />,
       },
-
     ]
   },
   {
@@ -110,10 +108,6 @@ const router = createBrowserRouter([
       {
         path: 'login',
         element: <AdminLogin />
-      },
-      {
-        path: 'signup',
-        element: <AdminSignup />
       },
       {
         path: '',

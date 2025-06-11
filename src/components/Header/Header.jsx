@@ -3,6 +3,7 @@ import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import { useAuth } from '../../features/useAuth';
 import { selectIsAuthenticated, selectCurrentUser } from '../../features/authSlice';
+import { useGetCartQuery } from '../../features/RTKQUERY';
 
 export default function Header() {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -18,11 +19,19 @@ export default function Header() {
     const user = useSelector(selectCurrentUser);
     const { logout } = useAuth();
     
-    // Cart state from Redux
-    const cart = useSelector((state) => state.cart) || {
-        items: [],
-        totalItems: 0,
-        totalPrice: 0,
+    // Get cart data from backend
+    const { data: cartData, isLoading: isCartLoading } = useGetCartQuery(undefined, {
+        skip: !isAuthenticated || !isCartOpen
+    });
+
+    // Calculate total quantity from cart items
+    const totalQuantity = cartData?.items?.reduce((total, item) => total + item.quantity, 0) || 0;
+
+    const formatCurrency = (amount) => {
+        return new Intl.NumberFormat('en-US', {
+            style: 'currency',
+            currency: 'USD'
+        }).format(amount);
     };
 
     const navItems = [
@@ -83,13 +92,6 @@ export default function Header() {
         setIsProfileOpen(false);
     };
 
-    const formatCurrency = (amount) => {
-        return new Intl.NumberFormat('en-US', {
-            style: 'currency',
-            currency: 'USD'
-        }).format(amount);
-    };
-    
     return (
         <header className='sticky top-0 z-50 shadow-md backdrop-blur-md bg-white'>
             <div className='text-white py-4 px-6 sm:px-10'>
@@ -135,9 +137,9 @@ export default function Header() {
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
                                     </svg>
                                     <span>Cart</span>
-                                    {cart.totalItems > 0 && (
+                                    {totalQuantity > 0 && (
                                         <span className="flex h-5 w-5 items-center justify-center rounded-full bg-gradient-to-r from-yellow-500 to-red-500 text-white text-xs font-bold ml-1">
-                                            {cart.totalItems}
+                                            {totalQuantity}
                                         </span>
                                     )}
                                 </button>
@@ -147,11 +149,19 @@ export default function Header() {
                                     <div className="absolute right-0 mt-2 w-72 bg-gray-800 rounded-lg shadow-lg py-1 z-10 border border-gray-700">
                                         <div className="px-4 py-2 border-b border-gray-700">
                                             <h3 className="text-sm font-medium text-white">Your Cart</h3>
+                                            {totalQuantity > 0 && (
+                                                <p className="text-xs text-gray-400 mt-1">{totalQuantity} {totalQuantity === 1 ? 'item' : 'items'}</p>
+                                            )}
                                         </div>
-                                        {cart.items.length > 0 ? (
+                                        {isCartLoading ? (
+                                            <div className="px-4 py-6 text-center">
+                                                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-yellow-500 mx-auto"></div>
+                                                <p className="text-sm text-gray-400 mt-2">Loading cart...</p>
+                                            </div>
+                                        ) : cartData?.items?.length > 0 ? (
                                             <>
                                                 <div className="max-h-60 overflow-y-auto">
-                                                    {cart.items.map((item, index) => (
+                                                    {cartData.items.map((item, index) => (
                                                         <div key={index} className="px-4 py-2 border-b border-gray-700 flex items-center">
                                                             <div className="h-10 w-10 flex-shrink-0 rounded-md overflow-hidden">
                                                                 <img src={item.image} alt={item.name} className="h-full w-full object-cover" />
@@ -170,7 +180,7 @@ export default function Header() {
                                                 <div className="px-4 py-2 border-b border-gray-700">
                                                     <div className="flex justify-between">
                                                         <p className="text-sm text-gray-300">Subtotal</p>
-                                                        <p className="text-sm font-medium text-white">{formatCurrency(cart.totalPrice)}</p>
+                                                        <p className="text-sm font-medium text-white">{formatCurrency(cartData.totalPrice)}</p>
                                                     </div>
                                                 </div>
                                                 

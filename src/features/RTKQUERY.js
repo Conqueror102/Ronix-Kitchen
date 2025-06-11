@@ -15,22 +15,15 @@ export const apiSlice = createApi({
       return headers;
     },
   }),
-  tagTypes: ['Product', 'Category'],
+  tagTypes: ['Product', 'Category', 'Cart'],
   endpoints: (builder) => ({
-    // PRODUCT ROUTES
-    getAllProducts: builder.query({
-      query: () => '/users/products',
-      providesTags: ['Product']
-    }),
-
-    getProductById: builder.query({
-      query: (id) => `/users/products/${id}`,
-      providesTags: (result, error, id) => [{ type: 'Product', id }]
-    }),
-
-    getProductsByCategory: builder.query({
-      query: (category) => `/users/getByCategory?category=${category}`,
-      providesTags: ['Product']
+    // ADMIN ROUTES
+    loginAdmin: builder.mutation({
+      query: (credentials) => ({
+        url: "/admin/login",
+        method: "POST",
+        body: credentials,
+      }),
     }),
 
     // USER ROUTES
@@ -48,6 +41,31 @@ export const apiSlice = createApi({
         method: "POST",
         body: newUser,
       }),
+    }),
+
+    // CART ROUTES
+    getCart: builder.query({
+      query: () => ({
+        url: "/users/get-cart",
+        method: "GET",
+      }),
+      providesTags: ['Cart'],
+    }),
+
+    // PRODUCT ROUTES
+    getAllProducts: builder.query({
+      query: () => 'users/all-product',
+      providesTags: ['Product']
+    }),
+
+    getProductById: builder.query({
+      query: (id) => `/users/products/${id}`,
+      providesTags: (result, error, id) => [{ type: 'Product', id }]
+    }),
+
+    getProductsByCategory: builder.query({
+      query: (category) => `/users/getByCategory?category=${category}`,
+      providesTags: ['Product']
     }),
 
     addToCart: builder.mutation({
@@ -70,23 +88,6 @@ export const apiSlice = createApi({
       query: () => ({
         url: "/users/createOrder",
         method: "POST",
-      }),
-    }),
-
-    // ADMIN ROUTES
-    loginAdmin: builder.mutation({
-      query: (credentials) => ({
-        url: "/admin/login",
-        method: "POST",
-        body: credentials,
-      }),
-    }),
-
-    signUpAdmin: builder.mutation({
-      query: (newAdmin) => ({
-        url: "/admin/signUp",
-        method: "POST",
-        body: newAdmin,
       }),
     }),
 
@@ -129,8 +130,8 @@ export const {
   useRemoveFromCartMutation,
   useCreateOrderMutation,
   useLoginAdminMutation,
-  useSignUpAdminMutation,
   useCreateProductMutation,
   useUpdateProductMutation,
   useDeleteProductMutation,
+  useGetCartQuery,
 } = apiSlice;

@@ -7,7 +7,6 @@ import { combineReducers } from 'redux';
 import { apiSlice } from '../features/RTKQUERY';
 import authReducer from '../features/authSlice';
 import adminReducer from '../features/adminSlice';
-import productSlice from "../features/productSlice.jsx"
 import cartReducer from '../features/cartSlice';
 import {
   FLUSH,
@@ -28,7 +27,6 @@ const rootReducer = combineReducers({
     [apiSlice.reducerPath]: apiSlice.reducer,
     auth: authReducer,
     admin: adminReducer,
-    product: productSlice,
     cart: cartReducer,
 });
 
