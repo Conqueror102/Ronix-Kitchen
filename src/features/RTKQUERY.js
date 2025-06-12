@@ -8,7 +8,10 @@ export const apiSlice = createApi({
   baseQuery: fetchBaseQuery({
     baseUrl,
     prepareHeaders: (headers, { getState }) => {
-      const token = getState().auth?.token;
+      const authToken = getState().auth?.token;
+      const adminToken = getState().admin?.adminData?.token;
+      const token = authToken || adminToken;
+      
       if (token) {
         headers.set("Authorization", `Bearer ${token}`);
       }
@@ -93,7 +96,7 @@ export const apiSlice = createApi({
 
     createProduct: builder.mutation({
       query: (formData) => ({
-        url: "/admin/createProduct",
+        url: "/users/create-product",
         method: "POST",
         body: formData,
       }),

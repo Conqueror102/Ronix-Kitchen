@@ -1,34 +1,41 @@
 import React, { useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import { useGetAllProductsQuery } from '../../features/RTKQUERY';
-import { addToCart } from '../../features/cartSlice';
+import { useSelector } from 'react-redux';
+import { useGetAllProductsQuery, useAddToCartMutation } from '../../features/RTKQUERY';
 import { selectIsAuthenticated } from '../../features/authSlice';
-// import Header from '../Header/Header';
-// import Footer from '../Footer/Footer';
 
 function Menu() {
   const [activeCategory, setActiveCategory] = useState('all');
-  const dispatch = useDispatch();
   const isAuthenticated = useSelector(selectIsAuthenticated);
-  const { data: products = [], isLoading, isError } = useGetAllProductsQuery();
+  const { data: products = {}, isLoading, isError } = useGetAllProductsQuery();
+  const [addToCart] = useAddToCartMutation();
+
+  // Ensure products is an array and handle the API response structure
+  const productsArray = Array.isArray(products?.product) ? products.product : [];
 
   // Extract unique categories from products
   const categories = [
     { id: 'all', name: 'All' },
-    ...Array.from(new Set(products.map(p => p.category))).map(cat => ({ id: cat, name: cat }))
+    ...Array.from(new Set(productsArray.map(p => p.category))).map(cat => ({ id: cat, name: cat }))
   ];
 
   // Filter products by category
   const filteredProducts = activeCategory === 'all'
-    ? products
-    : products.filter(p => p.category === activeCategory);
+    ? productsArray
+    : productsArray.filter(p => p.category === activeCategory);
 
-  const handleAddToCart = (product) => {
+  const handleAddToCart = async (product) => {
     if (!isAuthenticated) {
       alert('Please sign in to add items to your cart.');
       return;
     }
-    dispatch(addToCart(product));
+
+    try {
+      await addToCart({ productId: product._id, qty: 1 }).unwrap();
+      alert('Item added to cart successfully!');
+    } catch (error) {
+      console.error('Failed to add item to cart:', error);
+      alert(error.data?.message || 'Failed to add item to cart. Please try again.');
+    }
   };
 
   return (
@@ -72,16 +79,16 @@ function Menu() {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6 sm:gap-8">
             {filteredProducts.map((item) => (
               <div 
-                key={item.id}
-                className="bg-white rounded-xl overflow-hidden  shadow-lg flex flex-col sm:flex-row hover:shadow-xl transition duration-300"
+                key={item._id}
+                className="bg-white rounded-xl overflow-hidden shadow-lg flex flex-col sm:flex-row hover:shadow-xl transition duration-300"
               >
                 {/* Item Image */}
                 <div className="sm:w-1/3 relative">
                   <img 
-                    src={item.image} 
-                    alt={item.name} 
+                    src={item.image[0]} 
+                    alt={item.productName} 
                     className="w-full h-full object-cover object-center"
-                    style={{ height: '100%', minHeight: '140px' }}
+                    style={{ height: '200px', minHeight: '200px' }}
                   />
                   {item.tags && item.tags.length > 0 && (
                     <div className="absolute top-2 left-2 flex flex-wrap gap-1">
@@ -106,7 +113,7 @@ function Menu() {
                 {/* Item Details */}
                 <div className="p-4 sm:p-5 flex-1 flex flex-col justify-between">
                   <div>
-                    <h3 className="text-lg sm:text-xl font-bold text-white mb-1">{item.name}</h3>
+                    <h3 className="text-lg sm:text-xl font-bold text-black mb-1">{item.productName}</h3>
                     <p className="text-gray-400 text-sm mb-4">{item.description}</p>
                   </div>
                   <div className="flex justify-between items-center mt-auto">

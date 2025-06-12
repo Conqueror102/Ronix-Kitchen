@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useForm } from "react-hook-form";
+import { useCreateProductMutation } from '../../../../features/RTKQUERY';
 
 function AddProduct() {
   const [image, setImage] = useState(null);
@@ -13,6 +14,7 @@ function AddProduct() {
   const [categoriesLoading, setCategoriesLoading] = useState(true);
 
   const fileInputRef = useRef(null);
+  const [createProduct] = useCreateProductMutation();
 
   const { 
     register, 
@@ -67,7 +69,6 @@ function AddProduct() {
     }
   };
 
-  // Placeholder: Send product data to your backend API
   const addProduct = async (data) => {
     if (!image) {
       setUploadError('Please select an image for the product');
@@ -78,46 +79,30 @@ function AddProduct() {
     setUploadError(null);
 
     try {
-      const newProduct = {
-        name: data.productName,
-        price: data.productPrice,
-        description: data.productDescription,
-        // You may need to handle image upload separately
-        image: image, 
-        category: data.category,
-        featured: data.featured === 'true',
-        inStock: true,
-        dateAdded: new Date().toISOString()
-      };
+      const formData = new FormData();
+      formData.append('productName', data.productName);
+      formData.append('price', data.productPrice);
+      formData.append('description', data.productDescription);
+      formData.append('category', data.category);
+      formData.append('images', image);
+      // formData.append('featured', data.featured === 'true');
 
-      // Example: Replace with your API endpoint
-      // const formData = new FormData();
-      // Object.entries(newProduct).forEach(([key, value]) => formData.append(key, value));
-      // const response = await fetch('/api/products', {
-      //   method: 'POST',
-      //   body: formData
-      // });
-      // const result = await response.json();
+      const result = await createProduct(formData).unwrap();
+      console.log('Product added successfully:', result);
 
-      // Simulate success
-      const result = { productId: 'demo123', imageId: 'img123' };
+      if (result) {
+        setSubmitSuccess(true);
+        setUploadedFileId(result._id);
 
-      if (result && result.imageId) {
-        setUploadedFileId(result.imageId);
+        setTimeout(() => {
+          reset();
+          resetImage();
+          setSubmitSuccess(false);
+        }, 3000);
       }
-
-      console.log('Product added successfully with ID:', result.productId);
-      setSubmitSuccess(true);
-
-      setTimeout(() => {
-        reset();
-        resetImage();
-        setSubmitSuccess(false);
-      }, 3000);
-
     } catch (error) {
       console.error('Failed to add product:', error);
-      setUploadError(error.message || 'Failed to add product');
+      setUploadError(error.data?.message || 'Failed to add product');
     } finally {
       setIsSubmitting(false);
     }

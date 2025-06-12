@@ -14,7 +14,12 @@ export const useAdminAuth = () => {
       const result = await loginAdmin(credentials).unwrap();
       console.log('Admin Login Response:', result);
       
-      dispatch(setAdminCredentials(result));
+      const adminData = {
+        ...result,
+        token: result.token
+      };
+      
+      dispatch(setAdminCredentials(adminData));
       navigate('/admin/dashboard', { replace: true });
       return result;
     } catch (error) {
