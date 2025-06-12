@@ -1,9 +1,10 @@
 // src/admin/components/layout/Sidebar.jsx
-import React from 'react';
+import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 
 function Sidebar() {
     const location = useLocation();
+    const [isOpen, setIsOpen] = useState(true);
 
     // Helper function to check if a link is active
     const isActive = (path) => {
@@ -97,98 +98,133 @@ function Sidebar() {
     };
 
     return (
-        <div 
-            className="h-screen w-72 flex flex-col justify-between top-0 left-0 sticky bg-white shadow-lg overflow-y-auto"
-            style={scrollbarHideStyles}
-        >
-            <style jsx>{`
-                .hide-scrollbar::-webkit-scrollbar {
-                    display: none;
-                }
-                .hide-scrollbar {
-                    -ms-overflow-style: none;
-                    scrollbar-width: none;
-                }
-            `}</style>
-            
-            {/* Admin logo and profile */}
-            <div className="flex-1 overflow-y-auto hide-scrollbar">
-                <div className="p-6">
-                    <Link to="/" className="flex items-center justify-center mb-6">
-                        <div className="w-12 h-12 rounded-full bg-vibrantOrange flex items-center justify-center text-white font-bold text-xl">
-                            R
+        <>
+            {/* Mobile Toggle Button */}
+            <button
+                onClick={() => setIsOpen(!isOpen)}
+                className="lg:hidden fixed top-4 left-4 z-50 p-2 rounded-lg bg-white shadow-lg hover:bg-softOrange/40 transition-colors"
+            >
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-vibrantOrange" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+                </svg>
+            </button>
+
+            {/* Overlay */}
+            {isOpen && (
+                <div 
+                    className="fixed inset-0 bg-black bg-opacity-50 z-40 lg:hidden"
+                    onClick={() => setIsOpen(false)}
+                />
+            )}
+
+            {/* Sidebar */}
+            <div 
+                className={`fixed lg:static inset-y-0 left-0 z-50 w-72 flex flex-col justify-between bg-white shadow-lg transform transition-transform duration-300 ease-in-out ${
+                    isOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'
+                }`}
+                style={scrollbarHideStyles}
+            >
+                <style jsx>{`
+                    .hide-scrollbar::-webkit-scrollbar {
+                        display: none;
+                    }
+                    .hide-scrollbar {
+                        -ms-overflow-style: none;
+                        scrollbar-width: none;
+                    }
+                `}</style>
+                
+                {/* Admin logo and profile */}
+                <div className="flex-1 overflow-y-auto hide-scrollbar">
+                    <div className="p-6">
+                        <div className="flex items-center justify-between mb-6">
+                            <Link to="/" className="flex items-center">
+                                <div className="w-12 h-12 rounded-full bg-vibrantOrange flex items-center justify-center text-white font-bold text-xl">
+                                    R
+                                </div>
+                                <span className="ml-4 text-xl font-bold bg-clip-text text-transparent bg-vibrantOrange">
+                                    Admin
+                                </span>
+                            </Link>
+                            <button
+                                onClick={() => setIsOpen(false)}
+                                className="lg:hidden p-2 rounded-lg hover:bg-softOrange/40 transition-colors"
+                            >
+                                <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-vibrantOrange" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                                </svg>
+                            </button>
                         </div>
-                        <span className="ml-4 text-xl font-bold bg-clip-text text-transparent bg-vibrantOrange">
-                            Admin
-                        </span>
-                    </Link>
+                        
+                        <div className="mt-6 flex flex-col items-center">
+                            <div className="relative">
+                                <img
+                                    src="https://st3.depositphotos.com/6672868/13701/v/450/depositphotos_137014128-stock-illustration-user-profile-icon.jpg"
+                                    alt="Admin"
+                                    className="w-24 h-24 rounded-full border-2 border-softPeach object-cover shadow-md"
+                                />
+                                <div className="absolute -bottom-1 -right-1 w-6 h-6 bg-green-500 rounded-full border-2 border-lightOrange"></div>
+                            </div>
+                            <h2 className="mt-3 text-lg font-bold text-vibrantOrange">Creed</h2>
+                            <p className="text-sm text-black">Administrator</p>
+                        </div>
+                    </div>
                     
-                    <div className="mt-6 flex flex-col items-center">
-                        <div className="relative">
-                            <img
-                                src="https://st3.depositphotos.com/6672868/13701/v/450/depositphotos_137014128-stock-illustration-user-profile-icon.jpg"
-                                alt="Admin"
-                                className="w-24 h-24 rounded-full border-2 border-softPeach object-cover shadow-md"
-                            />
-                            <div className="absolute -bottom-1 -right-1 w-6 h-6 bg-green-500 rounded-full border-2 border-lightOrange"></div>
-                        </div>
-                        <h2 className="mt-3 text-lg font-bold text-vibrantOrange">Creed</h2>
-                        <p className="text-sm text-b;ack">Administrator</p>
+                    <div className="px-4 mt-4">
+                        {/* Navigation Groups */}
+                        {navigationGroups.map((group, index) => (
+                            <div key={group.title} className="mb-6">
+                                {index > 0 && (
+                                    <div className="h-px bg-gradient-to-r from-transparent via-softPeach to-transparent mb-4"></div>
+                                )}
+                                
+                                <h3 className="text-xs uppercase font-semibold px-4 mb-3"
+                                    style={{
+                                        color: '#FFB366',
+                                        letterSpacing: '0.05em',
+                                        textShadow: '0 1px 0 #fff, 0 0px 2px #FFB366'
+                                    }}
+                                >
+                                    {group.title}
+                                </h3>
+                                
+                                <nav className="space-y-2">
+                                    {group.items.map((item) => (
+                                        <Link 
+                                            key={item.name}
+                                            to={item.path} 
+                                            className={`flex items-center px-4 py-3 rounded-lg transition-all duration-200 ${
+                                                isActive(item.path) 
+                                                    ? 'bg-vibrantOrange/20 text-vibrantOrange border-l-4 border-vibrantOrange font-semibold' 
+                                                    : 'text-black hover:bg-softOrange/20 hover:text-vibrantOrange'
+                                            }`}
+                                            onClick={() => setIsOpen(false)}
+                                        >
+                                            <span className="mr-4 text-lg">{item.icon}</span>
+                                            <span className="font-medium text-base">{item.name}</span>
+                                        </Link>
+                                    ))}
+                                </nav>
+                            </div>
+                        ))}
                     </div>
                 </div>
                 
-                <div className="px-4 mt-4">
-                    {/* Navigation Groups */}
-                    {navigationGroups.map((group, index) => (
-                        <div key={group.title} className="mb-6">
-                            {index > 0 && (
-                                <div className="h-px bg-gradient-to-r from-transparent via-softPeach to-transparent mb-4"></div>
-                            )}
-                            
-                            <h3 className="text-xs uppercase font-semibold px-4 mb-3"
-                                style={{
-                                    color: '#FFB366', // fallback for softOrange
-                                    letterSpacing: '0.05em',
-                                    textShadow: '0 1px 0 #fff, 0 0px 2px #FFB366'
-                                }}
-                            >
-                                {group.title}
-                            </h3>
-                            
-                            <nav className="space-y-2">
-                                {group.items.map((item) => (
-                                    <Link 
-                                        key={item.name}
-                                        to={item.path} 
-                                        className={`flex items-center px-4 py-3 rounded-lg transition-all duration-200 ${
-                                            isActive(item.path) 
-                                                ? 'bg-vibrantOrange/20 text-vibrantOrange border-l-4 border-vibrantOrange font-semibold' 
-                                                : 'text-black hover:bg-softOrange/20 hover:text-vibrantOrange'
-                                        }`}
-                                    >
-                                        <span className="mr-4 text-lg">{item.icon}</span>
-                                        <span className="font-medium text-base">{item.name}</span>
-                                    </Link>
-                                ))}
-                            </nav>
-                        </div>
-                    ))}
+                {/* Logout button */}
+                <div className="p-4 border-t border-softPeach">
+                    <Link 
+                        to="/auth-page" 
+                        className="flex items-center px-5 py-3 text-red-400 rounded-lg hover:bg-red-500/10 transition-all duration-200"
+                        onClick={() => setIsOpen(false)}
+                    >
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 mr-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                        </svg>
+                        <span className="font-medium text-base">Logout</span>
+                    </Link>
                 </div>
             </div>
-            
-            {/* Logout button */}
-            <div className="p-4 border-t border-softPeach">
-                <Link 
-                    to="/auth-page" 
-                    className="flex items-center px-5 py-3 text-red-400 rounded-lg hover:bg-red-500/10 transition-all duration-200"
-                >
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 mr-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
-                    </svg>
-                    <span className="font-medium text-base">Logout</span>
-                </Link>
-            </div>
-        </div>
+        </>
     );
 }
 

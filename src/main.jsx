@@ -37,6 +37,7 @@ import OrderPage from './pages/OrderPage.jsx'
 import CategoryManagement from './pages/admin/components/subComponents/CategoryManagement.jsx'
 import CheckoutPage from './pages/CheckoutPage.jsx'
 import PreviousOrdersPage from './pages/PreviousOrdersPage.jsx'
+import CartPage from './pages/CartPage.jsx'
 
 const router = createBrowserRouter([
   {
@@ -66,6 +67,10 @@ const router = createBrowserRouter([
       {
         path: 'about',
         element: <About />,
+      },
+      {
+        path: 'cart',
+        element: <ProtectedRoute><CartPage /></ProtectedRoute>,
       },
     ]
   },
