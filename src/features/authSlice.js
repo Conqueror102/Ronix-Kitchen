@@ -40,10 +40,8 @@ const authSlice = createSlice({
   },
 });
 
-// Export actions
 export const { setCredentials, setError, setLoading, logout } = authSlice.actions;
 
-// Export selectors
 export const selectCurrentUser = (state) => state.auth.user;
 export const selectCurrentToken = (state) => state.auth.token;
 export const selectIsAuthenticated = (state) => state.auth.status;
@@ -52,5 +50,4 @@ export const selectIsAdmin = (state) => state.auth.role === 'admin';
 export const selectAuthError = (state) => state.auth.error;
 export const selectAuthLoading = (state) => state.auth.loading;
 
-// Export reducer
 export default authSlice.reducer;

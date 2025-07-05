@@ -1,173 +1,71 @@
 import React, { useState } from 'react';
-
-// No Firebase or Appwrite code is present in this file.
-// If you add backend integration, replace the hardcoded customers array and CRUD logic with your API calls.
+import { useGetAllUsersAdminQuery } from '../../../../features/RTKQUERY'; // Adjust path if needed
 
 function Customers() {
-  const [customers, setCustomers] = useState([
-    {
-      id: 1,
-      name: "Emily Johnson",
-      email: "emily.j@example.com",
-      phone: "+1 (555) 123-4567",
-      orders: 12,
-      totalSpent: 458.97,
-      lastOrder: "2025-04-10T14:48:00",
-      status: "active",
-      joinDate: "2024-09-15T09:30:00",
-      avatar: "https://randomuser.me/api/portraits/women/12.jpg",
-      location: "New York, USA"
-    },
-    {
-      id: 2,
-      name: "Hiroshi Tanaka",
-      email: "h.tanaka@example.com",
-      phone: "+81 90-1234-5678",
-      orders: 24,
-      totalSpent: 892.50,
-      lastOrder: "2025-04-22T18:23:00",
-      status: "active",
-      joinDate: "2024-06-05T11:45:00",
-      avatar: "https://randomuser.me/api/portraits/men/42.jpg",
-      location: "Tokyo, Japan"
-    },
-    {
-      id: 3,
-      name: "Sofia Rodriguez",
-      email: "sofia.r@example.com",
-      phone: "+1 (555) 987-6543",
-      orders: 8,
-      totalSpent: 215.75,
-      lastOrder: "2025-04-15T12:10:00",
-      status: "active",
-      joinDate: "2024-10-20T15:20:00",
-      avatar: "https://randomuser.me/api/portraits/women/45.jpg",
-      location: "Miami, USA"
-    },
-    {
-      id: 4,
-      name: "James Wilson",
-      email: "james.w@example.com",
-      phone: "+1 (555) 456-7890",
-      orders: 5,
-      totalSpent: 157.34,
-      lastOrder: "2025-03-28T09:15:00",
-      status: "inactive",
-      joinDate: "2024-11-10T14:30:00",
-      avatar: "https://randomuser.me/api/portraits/men/32.jpg",
-      location: "Chicago, USA"
-    },
-    {
-      id: 5,
-      name: "Yuki Sato",
-      email: "yuki.s@example.com",
-      phone: "+81 80-9876-5432",
-      orders: 18,
-      totalSpent: 612.42,
-      lastOrder: "2025-04-18T20:05:00",
-      status: "active",
-      joinDate: "2024-07-25T08:15:00",
-      avatar: "https://randomuser.me/api/portraits/women/65.jpg",
-      location: "Osaka, Japan"
-    },
-    {
-      id: 6,
-      name: "Michael Brown",
-      email: "m.brown@example.com",
-      phone: "+1 (555) 789-0123",
-      orders: 3,
-      totalSpent: 78.95,
-      lastOrder: "2025-02-10T11:30:00",
-      status: "inactive",
-      joinDate: "2025-01-05T16:45:00",
-      avatar: "https://randomuser.me/api/portraits/men/55.jpg",
-      location: "Los Angeles, USA"
-    },
-    {
-      id: 7,
-      name: "Keiko Yamamoto",
-      email: "k.yamamoto@example.com",
-      phone: "+81 70-1122-3344",
-      orders: 15,
-      totalSpent: 487.25,
-      lastOrder: "2025-04-05T13:20:00",
-      status: "active",
-      joinDate: "2024-08-12T10:10:00",
-      avatar: "https://randomuser.me/api/portraits/women/76.jpg",
-      location: "Kyoto, Japan"
-    },
-    {
-      id: 8,
-      name: "David Martinez",
-      email: "david.m@example.com",
-      phone: "+1 (555) 234-5678",
-      orders: 9,
-      totalSpent: 345.80,
-      lastOrder: "2025-03-22T15:40:00",
-      status: "active",
-      joinDate: "2024-09-30T09:00:00",
-      avatar: "https://randomuser.me/api/portraits/men/67.jpg",
-      location: "San Francisco, USA"
-    }
-  ]);
+  // RTK Query hook for fetching customer data
+  const {
+    data: customersData,
+    isLoading: areCustomersLoading,
+    isError: customersFetchError,
+    error: customersErrorDetails,
+    refetch: refetchCustomers // Option to manually refetch customers
+  } = useGetAllUsersAdminQuery();
 
+  // Local UI State
   const [search, setSearch] = useState('');
   const [selectedCustomer, setSelectedCustomer] = useState(null);
-  const [statusFilter, setStatusFilter] = useState('all');
-  const [sortField, setSortField] = useState('lastOrder');
+  const [sortField, setSortField] = useState('joinDate'); // Default sort to joinDate (createdAt)
   const [sortDirection, setSortDirection] = useState('desc');
 
-  // Filter and sort customers
-  const filteredCustomers = () => {
-    return customers
-      .filter(customer => {
-        // Apply search filter
-        const searchLower = search.toLowerCase();
-        const matchesSearch = 
-          customer.name.toLowerCase().includes(searchLower) ||
-          customer.email.toLowerCase().includes(searchLower) ||
-          customer.location.toLowerCase().includes(searchLower);
-        
-        // Apply status filter
-        const matchesStatus = statusFilter === 'all' || customer.status === statusFilter;
-        
-        return matchesSearch && matchesStatus;
-      })
-      .sort((a, b) => {
-        // Sort by selected field
-        if (sortField === 'name') {
-          return sortDirection === 'asc' 
-            ? a.name.localeCompare(b.name) 
-            : b.name.localeCompare(a.name);
-        }
-        
-        if (sortField === 'joinDate') {
-          return sortDirection === 'asc' 
-            ? new Date(a.joinDate) - new Date(b.joinDate) 
-            : new Date(b.joinDate) - new Date(a.joinDate);
-        }
-        
-        if (sortField === 'lastOrder') {
-          return sortDirection === 'asc' 
-            ? new Date(a.lastOrder) - new Date(b.lastOrder) 
-            : new Date(b.lastOrder) - new Date(a.lastOrder);
-        }
-        
-        if (sortField === 'orders') {
-          return sortDirection === 'asc' 
-            ? a.orders - b.orders 
-            : b.orders - a.orders;
-        }
-        
-        if (sortField === 'totalSpent') {
-          return sortDirection === 'asc' 
-            ? a.totalSpent - b.totalSpent 
-            : b.totalSpent - a.totalSpent;
-        }
-        
-        return 0;
+  // Extract customers array from RTK Query response, default to empty array
+  const customers = customersData?.users || [];
+
+  // --- DEBUGGING: Log incoming customer data to console ---
+  // You can remove this useEffect once you confirm the data
+  React.useEffect(() => {
+    if (customers.length > 0) {
+      console.log("Customers data received:", customers);
+      customers.forEach((customer, index) => {
+        console.log(`Customer ${index + 1} (${customer.fullName}): createdAt =`, customer.createdAt);
       });
+    }
+  }, [customers]);
+  // --- END DEBUGGING ---
+
+  // Unified loading and error states for initial fetch
+  const isLoading = areCustomersLoading;
+  const mainFetchError = customersFetchError ?
+    (customersErrorDetails?.data?.message || customersErrorDetails?.error || 'Failed to load customers from server.') : null;
+
+  // Filter and sort customers based on available schema fields
+  const filteredAndSortedCustomers = () => {
+    let filtered = customers.filter(customer => {
+      const searchLower = search.toLowerCase();
+      const customerFullName = customer.fullName?.toLowerCase() || '';
+      const customerEmail = customer.email?.toLowerCase() || '';
+      const customerPhoneNumber = customer.phoneNumber?.toLowerCase() || '';
+
+      return (
+        customerFullName.includes(searchLower) ||
+        customerEmail.includes(searchLower) ||
+        customerPhoneNumber.includes(searchLower)
+      );
+    });
+
+    // Sort by selected field (fullName or joinDate using createdAt)
+    return filtered.sort((a, b) => {
+      let comparison = 0;
+      if (sortField === 'fullName') {
+        comparison = (a.fullName || '').localeCompare(b.fullName || '');
+      } else if (sortField === 'joinDate') {
+        // Use `createdAt` directly from Mongoose, provide fallback for invalid/missing dates
+        comparison = new Date(a.createdAt || 0) - new Date(b.createdAt || 0);
+      }
+      return sortDirection === 'asc' ? comparison : -comparison;
+    });
   };
+
+  const currentCustomers = filteredAndSortedCustomers();
 
   // Handle sort toggle
   const toggleSort = (field) => {
@@ -184,76 +82,51 @@ function Customers() {
     setSelectedCustomer(customer);
   };
 
-  // Format date to readable string
+  // Format date to readable string (using `createdAt` for `joinDate`)
   const formatDate = (dateString) => {
-    const options = { year: 'numeric', month: 'short', day: 'numeric' };
-    return new Date(dateString).toLocaleDateString(undefined, options);
-  };
-
-  // Format time ago from date
-  const timeAgo = (dateString) => {
+    if (!dateString) return 'N/A'; // Handle null or undefined dateString
     const date = new Date(dateString);
-    const now = new Date();
-    const seconds = Math.floor((now - date) / 1000);
-    
-    let interval = seconds / 31536000; // 60 * 60 * 24 * 365
-    if (interval > 1) {
-      return Math.floor(interval) + " years ago";
-    }
-    interval = seconds / 2592000; // 60 * 60 * 24 * 30
-    if (interval > 1) {
-      return Math.floor(interval) + " months ago";
-    }
-    interval = seconds / 86400; // 60 * 60 * 24
-    if (interval > 1) {
-      return Math.floor(interval) + " days ago";
-    }
-    interval = seconds / 3600; // 60 * 60
-    if (interval > 1) {
-      return Math.floor(interval) + " hours ago";
-    }
-    interval = seconds / 60;
-    if (interval > 1) {
-      return Math.floor(interval) + " minutes ago";
-    }
-    return Math.floor(seconds) + " seconds ago";
+    if (isNaN(date.getTime())) return 'Invalid Date'; // Handle invalid date objects
+    const options = { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }; // Added time for more detail
+    return date.toLocaleString(undefined, options);
   };
 
-  // Format currency
-  const formatCurrency = (amount) => {
-    return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(amount);
+  // WhatsApp Contact Number (PLACEHOLDER - REPLACE WITH YOUR ACTUAL WHATSAPP NUMBER)
+  const WHATSAPP_COMPANY_NUMBER = '+1234567890'; // E.g., '+2348012345678' for Nigeria
+
+  // Handle "Contact on WhatsApp" button click
+  const handleWhatsappContact = () => {
+    const message = encodeURIComponent(`Hello ${selectedCustomer?.fullName || 'customer'}, I'm contacting you from the admin dashboard regarding your account.`);
+    // Use the specific customer's phone number if available, otherwise fallback to company number
+    const contactNumber = selectedCustomer?.phoneNumber || WHATSAPP_COMPANY_NUMBER;
+    window.open(`https://wa.me/${contactNumber}?text=${message}`, '_blank');
   };
 
-  // Calculate total metrics
+  // Calculate total customers metric
   const calculateMetrics = () => {
-    const filtered = filteredCustomers();
-    
     return {
-      totalCustomers: filtered.length,
-      activeCustomers: filtered.filter(c => c.status === 'active').length,
-      totalOrders: filtered.reduce((sum, c) => sum + c.orders, 0),
-      totalRevenue: filtered.reduce((sum, c) => sum + c.totalSpent, 0)
+      totalCustomers: customers.length,
     };
   };
 
   const metrics = calculateMetrics();
 
   return (
-    <div className='flex flex-col space-y-6'>
+    <div className='flex flex-col space-y-6 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8'>
       {/* Header */}
-      <div className="bg-white/90 rounded-xl shadow-md overflow-hidden">
+      <div className="bg-white/90 rounded-xl shadow-md overflow-hidden backdrop-blur-md">
         <div className="p-6">
           <div className="flex flex-col md:flex-row justify-between items-start md:items-center">
             <div>
-              <h2 className="text-2xl font-bold text-black mb-2">
-                Customer <span className="bg-clip-text text-transparent bg-vibrantOrange">Management</span>
+              <h2 className="text-3xl font-extrabold text-black mb-2">
+                Customer <span className="bg-clip-text text-transparent bg-gradient-to-r from-softOrange to-vibrantOrange">Management</span>
               </h2>
-              <p className="text-gray-600">
+              <p className="text-gray-600 text-lg">
                 View and manage your customer base
               </p>
-              <div className="w-24 h-1 bg-gradient-to-r from-softOrange via-vibrantOrange to-softOrange mt-4"></div>
+              <div className="w-24 h-1 bg-gradient-to-r from-softOrange via-vibrantOrange to-softOrange mt-4 rounded-full"></div>
             </div>
-            <div className="mt-4 md:mt-0">
+            <div className="mt-6 md:mt-0">
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                   <svg className="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -265,7 +138,7 @@ function Customers() {
                   placeholder="Search customers..."
                   value={search}
                   onChange={(e) => setSearch(e.target.value)}
-                  className="pl-10 pr-4 py-2 w-full lg:w-64 bg-softOrange/40 text-black rounded-lg focus:outline-none focus:ring-2 focus:ring-vibrantOrange"
+                  className="pl-10 pr-4 py-2 w-full lg:w-64 bg-softOrange/40 text-black rounded-lg focus:outline-none focus:ring-2 focus:ring-vibrantOrange transition duration-200"
                 />
               </div>
             </div>
@@ -273,119 +146,45 @@ function Customers() {
         </div>
       </div>
 
-      {/* Customer Metrics */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+      {/* Customer Metrics (Simplified & Styled) */}
+      <div className="grid grid-cols-1"> {/* Changed to 1 column grid */}
         {/* Total Customers */}
-        <div className="bg-white/90 rounded-xl shadow-md overflow-hidden">
-          <div className="p-6">
-            <div className="flex justify-between items-start">
-              <div>
-                <p className="text-gray-600 text-sm mb-1">Total Customers</p>
-                <h3 className="text-2xl font-bold text-black">{metrics.totalCustomers}</h3>
-              </div>
-              <div className="h-12 w-12 bg-purple-500/20 rounded-lg flex items-center justify-center text-purple-500">
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
-                </svg>
-              </div>
-            </div>
+        <div className="bg-white/90 rounded-xl shadow-md overflow-hidden p-4 flex items-center justify-between backdrop-blur-md">
+          <div>
+            <p className="text-gray-600 text-sm mb-1">Total Registered Customers</p>
+            <h3 className="text-3xl font-bold text-black">{metrics.totalCustomers}</h3> {/* Larger text */}
           </div>
-        </div>
-        {/* Active Customers */}
-        <div className="bg-white/90 rounded-xl shadow-md overflow-hidden">
-          <div className="p-6">
-            <div className="flex justify-between items-start">
-              <div>
-                <p className="text-gray-600 text-sm mb-1">Active Customers</p>
-                <h3 className="text-2xl font-bold text-black">{metrics.activeCustomers}</h3>
-                <p className="text-green-600 text-sm mt-1">
-                  {metrics.totalCustomers > 0 ? Math.round((metrics.activeCustomers / metrics.totalCustomers) * 100) : 0}% active rate
-                </p>
-              </div>
-              <div className="h-12 w-12 bg-green-500/20 rounded-lg flex items-center justify-center text-green-600">
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                </svg>
-              </div>
-            </div>
-          </div>
-        </div>
-        {/* Total Orders */}
-        <div className="bg-white/90 rounded-xl shadow-md overflow-hidden">
-          <div className="p-6">
-            <div className="flex justify-between items-start">
-              <div>
-                <p className="text-gray-600 text-sm mb-1">Total Orders</p>
-                <h3 className="text-2xl font-bold text-black">{metrics.totalOrders}</h3>
-                <p className="text-gray-600 text-sm mt-1">
-                  Avg. {metrics.totalCustomers > 0 ? (metrics.totalOrders / metrics.totalCustomers).toFixed(1) : 0} per customer
-                </p>
-              </div>
-              <div className="h-12 w-12 bg-blue-500/20 rounded-lg flex items-center justify-center text-blue-600">
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
-                </svg>
-              </div>
-            </div>
-          </div>
-        </div>
-        {/* Total Revenue */}
-        <div className="bg-white/90 rounded-xl shadow-md overflow-hidden">
-          <div className="p-6">
-            <div className="flex justify-between items-start">
-              <div>
-                <p className="text-gray-600 text-sm mb-1">Total Revenue</p>
-                <h3 className="text-2xl font-bold text-black">{formatCurrency(metrics.totalRevenue)}</h3>
-                <p className="text-gray-600 text-sm mt-1">
-                  Avg. {metrics.totalCustomers > 0 ? formatCurrency(metrics.totalRevenue / metrics.totalCustomers) : "$0.00"} per customer
-                </p>
-              </div>
-              <div className="h-12 w-12 bg-yellow-500/20 rounded-lg flex items-center justify-center text-yellow-600">
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-              </div>
-            </div>
+          <div className="h-12 w-12 bg-purple-500/20 rounded-xl flex items-center justify-center text-purple-500"> {/* Larger icon container with rounded-xl */}
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-7 w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor"> {/* Larger icon */}
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+            </svg>
           </div>
         </div>
       </div>
 
-      {/* Filter options */}
-      <div className="bg-white/90 rounded-xl shadow-md overflow-hidden">
+      {/* Filter options (Simplified) */}
+      <div className="bg-white/90 rounded-xl shadow-md overflow-hidden backdrop-blur-md">
         <div className="p-6">
           <div className="flex flex-col md:flex-row justify-between gap-4">
-            <div className="w-full md:w-1/3">
-              <label className="block text-gray-600 text-sm mb-2">Filter by Status</label>
-              <select 
-                value={statusFilter}
-                onChange={(e) => setStatusFilter(e.target.value)}
-                className="w-full bg-softOrange/40 text-black px-4 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-vibrantOrange"
-              >
-                <option value="all">All Customers</option>
-                <option value="active">Active Customers</option>
-                <option value="inactive">Inactive Customers</option>
-              </select>
-            </div>
-            <div className="w-full md:w-1/3">
-              <label className="block text-gray-600 text-sm mb-2">Sort by</label>
-              <select 
+            <div className="w-full md:w-1/2">
+              <label htmlFor="sortField" className="block text-gray-600 text-sm mb-2">Sort by</label>
+              <select
+                id="sortField"
                 value={sortField}
                 onChange={(e) => {
                   setSortField(e.target.value);
-                  setSortDirection('desc');
+                  setSortDirection('desc'); // Reset to default desc for new sort field
                 }}
                 className="w-full bg-softOrange/40 text-black px-4 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-vibrantOrange"
               >
-                <option value="lastOrder">Last Order Date</option>
                 <option value="joinDate">Join Date</option>
-                <option value="orders">Number of Orders</option>
-                <option value="totalSpent">Total Spent</option>
-                <option value="name">Customer Name</option>
+                <option value="fullName">Customer Name</option>
               </select>
             </div>
-            <div className="w-full md:w-1/3">
-              <label className="block text-gray-600 text-sm mb-2">Order</label>
-              <select 
+            <div className="w-full md:w-1/2">
+              <label htmlFor="sortOrder" className="block text-gray-600 text-sm mb-2">Order</label>
+              <select
+                id="sortOrder"
                 value={sortDirection}
                 onChange={(e) => setSortDirection(e.target.value)}
                 className="w-full bg-softOrange/40 text-black px-4 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-vibrantOrange"
@@ -401,166 +200,132 @@ function Customers() {
       {/* Main content - Customers list and details */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Customer list */}
-        <div className={`${selectedCustomer ? 'lg:col-span-2' : 'lg:col-span-3'}`}>
-          <div className="bg-white/90 rounded-xl shadow-md overflow-hidden">
+        <div className={`${selectedCustomer ? 'lg:col-span-2' : 'lg:col-span-3'} transition-all duration-300`}>
+          <div className="bg-white/90 rounded-xl shadow-md overflow-hidden backdrop-blur-md">
             <div className="px-6 py-4 border-b border-softOrange/40 flex justify-between items-center">
               <h3 className="text-lg font-semibold text-black">Customer List</h3>
               <span className="text-gray-600 text-sm">
-                {filteredCustomers().length} {filteredCustomers().length === 1 ? 'customer' : 'customers'} found
+                {currentCustomers.length} {currentCustomers.length === 1 ? 'customer' : 'customers'} found
               </span>
             </div>
-            <div className="overflow-x-auto">
-              <table className="w-full">
-                <thead className="bg-softOrange/40">
-                  <tr>
-                    <th 
-                      className="px-6 py-3 text-left text-xs font-medium text-black uppercase tracking-wider cursor-pointer"
-                      onClick={() => toggleSort('name')}
-                    >
-                      <div className="flex items-center">
-                        Customer
-                        {sortField === 'name' && (
-                          <svg xmlns="http://www.w3.org/2000/svg" className="ml-1 h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={sortDirection === 'asc' ? "M5 15l7-7 7 7" : "M19 9l-7 7-7-7"} />
-                          </svg>
-                        )}
-                      </div>
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-black uppercase tracking-wider">Location</th>
-                    <th 
-                      className="px-6 py-3 text-left text-xs font-medium text-black uppercase tracking-wider cursor-pointer"
-                      onClick={() => toggleSort('joinDate')}
-                    >
-                      <div className="flex items-center">
-                        Joined
-                        {sortField === 'joinDate' && (
-                          <svg xmlns="http://www.w3.org/2000/svg" className="ml-1 h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={sortDirection === 'asc' ? "M5 15l7-7 7 7" : "M19 9l-7 7-7-7"} />
-                          </svg>
-                        )}
-                      </div>
-                    </th>
-                    <th 
-                      className="px-6 py-3 text-left text-xs font-medium text-black uppercase tracking-wider cursor-pointer"
-                      onClick={() => toggleSort('orders')}
-                    >
-                      <div className="flex items-center">
-                        Orders
-                        {sortField === 'orders' && (
-                          <svg xmlns="http://www.w3.org/2000/svg" className="ml-1 h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={sortDirection === 'asc' ? "M5 15l7-7 7 7" : "M19 9l-7 7-7-7"} />
-                          </svg>
-                        )}
-                      </div>
-                    </th>
-                    <th 
-                      className="px-6 py-3 text-left text-xs font-medium text-black uppercase tracking-wider cursor-pointer"
-                      onClick={() => toggleSort('totalSpent')}
-                    >
-                      <div className="flex items-center">
-                        Total Spent
-                        {sortField === 'totalSpent' && (
-                          <svg xmlns="http://www.w3.org/2000/svg" className="ml-1 h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={sortDirection === 'asc' ? "M5 15l7-7 7 7" : "M19 9l-7 7-7-7"} />
-                          </svg>
-                        )}
-                      </div>
-                    </th>
-                    <th 
-                      className="px-6 py-3 text-left text-xs font-medium text-black uppercase tracking-wider cursor-pointer"
-                      onClick={() => toggleSort('lastOrder')}
-                    >
-                      <div className="flex items-center">
-                        Last Order
-                        {sortField === 'lastOrder' && (
-                          <svg xmlns="http://www.w3.org/2000/svg" className="ml-1 h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={sortDirection === 'asc' ? "M5 15l7-7 7 7" : "M19 9l-7 7-7-7"} />
-                          </svg>
-                        )}
-                      </div>
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-black uppercase tracking-wider">Status</th>
-                    <th className="px-6 py-3 text-right text-xs font-medium text-black uppercase tracking-wider">Actions</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-softOrange/40">
-                  {filteredCustomers().map((customer, index) => (
-                    <tr key={customer.id} className={index % 2 === 0 ? 'bg-softOrange/10' : 'bg-white/60'}>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="flex items-center">
-                          <div className="h-10 w-10 flex-shrink-0 rounded-full overflow-hidden">
-                            <img className="h-10 w-10 object-cover" src={customer.avatar} alt={customer.name} />
-                          </div>
-                          <div className="ml-4">
-                            <div className="text-sm font-medium text-black">{customer.name}</div>
-                            <div className="text-sm text-gray-600">{customer.email}</div>
-                          </div>
-                        </div>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
-                        {customer.location}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
-                        {formatDate(customer.joinDate)}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
-                        {customer.orders}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
-                        {formatCurrency(customer.totalSpent)}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
-                        {timeAgo(customer.lastOrder)}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <span className={`px-2 py-1 text-xs font-medium rounded-full ${
-                          customer.status === 'active' ? 'bg-green-500/10 text-green-600' : 'bg-softOrange/40 text-black'
-                        }`}>
-                          {customer.status === 'active' ? 'Active' : 'Inactive'}
-                        </span>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                        <button 
-                          onClick={() => viewCustomerDetails(customer)}
-                          className="text-vibrantOrange hover:text-orange-600 transition duration-150"
-                        >
-                          View
-                        </button>
-                      </td>
-                    </tr>
-                  ))}
-
-                  {filteredCustomers().length === 0 && (
-                    <tr>
-                      <td colSpan="8" className="px-6 py-10 text-center text-gray-400">
-                        <svg xmlns="http://www.w3.org/2000/svg" className="h-10 w-10 mx-auto text-gray-300 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
-                        </svg>
-                        <p className="text-lg">No customers found</p>
-                        <p className="text-sm mt-1">Try adjusting your search or filter criteria</p>
-                      </td>
-                    </tr>
-                  )}
-                </tbody>
-              </table>
-            </div>
-            <div className="px-6 py-4 bg-softOrange/10 border-t border-softOrange/40">
-              <p className="text-sm text-gray-600">
-                Showing {filteredCustomers().length} {filteredCustomers().length === 1 ? 'customer' : 'customers'} 
-                {statusFilter !== 'all' ? ` with status "${statusFilter}"` : ''} 
-                {search ? ` matching "${search}"` : ''}
-              </p>
-            </div>
+            {isLoading && customers.length === 0 ? (
+              <div className="p-8 flex justify-center">
+                <div className="flex items-center space-x-2">
+                  <svg className="animate-spin h-5 w-5 text-vibrantOrange" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                  </svg>
+                  <span className="text-vibrantOrange">Loading customers...</span>
+                </div>
+              </div>
+            ) : mainFetchError ? (
+              <div className="p-8 text-center text-red-600">
+                <h2 className="text-xl font-bold mb-2">Error Loading Customers</h2>
+                <p className="text-gray-600">Failed to fetch customer data from the server. This could be due to a network issue or server problem.</p>
+                <p className="text-sm text-gray-500">Details: {mainFetchError}</p>
+                <button onClick={refetchCustomers} className="mt-4 px-4 py-2 bg-vibrantOrange text-white rounded-lg hover:bg-softOrange transition-colors">
+                  Retry Fetch
+                </button>
+              </div>
+            ) : (
+              <>
+                {currentCustomers.length > 0 ? (
+                  <div className="overflow-x-auto">
+                    <table className="w-full">
+                      <thead className="bg-softOrange/40">
+                        <tr>
+                          <th
+                            className="px-6 py-3 text-left text-xs font-medium text-black uppercase tracking-wider cursor-pointer"
+                            onClick={() => toggleSort('fullName')}
+                          >
+                            <div className="flex items-center">
+                              Customer Name
+                              {sortField === 'fullName' && (
+                                <svg xmlns="http://www.w3.org/2000/svg" className="ml-1 h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={sortDirection === 'asc' ? "M5 15l7-7 7 7" : "M19 9l-7 7-7-7"} />
+                                </svg>
+                              )}
+                            </div>
+                          </th>
+                          <th className="px-6 py-3 text-left text-xs font-medium text-black uppercase tracking-wider">Email</th>
+                          <th className="px-6 py-3 text-left text-xs font-medium text-black uppercase tracking-wider">Phone Number</th>
+                          <th
+                            className="px-6 py-3 text-left text-xs font-medium text-black uppercase tracking-wider cursor-pointer"
+                            onClick={() => toggleSort('joinDate')}
+                          >
+                            <div className="flex items-center">
+                              Joined Date
+                              {sortField === 'joinDate' && (
+                                <svg xmlns="http://www.w3.org/2000/svg" className="ml-1 h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={sortDirection === 'asc' ? "M5 15l7-7 7 7" : "M19 9l-7 7-7-7"} />
+                                </svg>
+                              )}
+                            </div>
+                          </th>
+                          <th className="px-6 py-3 text-right text-xs font-medium text-black uppercase tracking-wider">Actions</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-softOrange/40">
+                        {currentCustomers.map((customer, index) => (
+                          <tr key={customer._id} className={index % 2 === 0 ? 'bg-softOrange/10' : 'bg-white/60'}>
+                            <td className="px-6 py-4 whitespace-nowrap">
+                              <div className="flex items-center">
+                                <div className="ml-4">
+                                  <div className="text-sm font-medium text-black">{customer.fullName || 'N/A'}</div>
+                                </div>
+                              </div>
+                            </td>
+                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
+                              {customer.email || 'N/A'}
+                            </td>
+                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
+                              {customer.phoneNumber || 'N/A'}
+                            </td>
+                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
+                              {formatDate(customer.createdAt)} {/* Use createdAt from schema */}
+                            </td>
+                            <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                              <button
+                                onClick={() => viewCustomerDetails(customer)}
+                                className="text-vibrantOrange hover:text-orange-600 transition duration-150"
+                              >
+                                View
+                              </button>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                ) : (
+                  <div className="p-8 text-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-12 w-12 mx-auto text-vibrantOrange mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                    </svg>
+                    <p className="text-vibrantOrange text-lg">No customers found</p>
+                    <p className="text-gray-600 text-sm mt-1">There are no customers matching your current filters.</p>
+                  </div>
+                )}
+              </>
+            )}
+            {!isLoading && currentCustomers.length > 0 && (
+              <div className="px-6 py-4 bg-softOrange/10 border-t border-softOrange/40">
+                <p className="text-sm text-gray-600">
+                  Showing {currentCustomers.length} {currentCustomers.length === 1 ? 'customer' : 'customers'}
+                  {search ? ` matching "${search}"` : ''}
+                </p>
+              </div>
+            )}
           </div>
         </div>
-        
+
         {/* Customer details */}
         {selectedCustomer && (
-          <div className="lg:col-span-1">
-            <div className="bg-white/90 rounded-xl shadow-md overflow-hidden sticky top-6">
+          <div className="lg:col-span-1 transition-all duration-300">
+            <div className="bg-white/90 rounded-xl shadow-md overflow-hidden sticky top-6 backdrop-blur-md">
               <div className="px-6 py-4 border-b border-softOrange/40 flex justify-between items-center">
                 <h3 className="text-lg font-semibold text-black">Customer Details</h3>
-                <button 
+                <button
                   onClick={() => setSelectedCustomer(null)}
                   className="text-gray-600 hover:text-black transition duration-150"
                 >
@@ -569,79 +334,37 @@ function Customers() {
                   </svg>
                 </button>
               </div>
-              
+
               <div className="p-6">
                 <div className="flex flex-col items-center mb-6">
-                  <div className="h-24 w-24 rounded-full overflow-hidden mb-4">
-                    <img className="h-24 w-24 object-cover" src={selectedCustomer.avatar} alt={selectedCustomer.name} />
-                  </div>
-                  <h4 className="text-xl font-semibold text-black">{selectedCustomer.name}</h4>
-                  <p className="text-gray-600 mt-1">{selectedCustomer.email}</p>
-                  <span className={`mt-3 px-3 py-1 text-xs font-medium rounded-full ${
-                    selectedCustomer.status === 'active' ? 'bg-green-500/10 text-green-600' : 'bg-softOrange/40 text-black'
-                  }`}>
-                    {selectedCustomer.status === 'active' ? 'Active Customer' : 'Inactive Customer'}
-                  </span>
+                  <h4 className="text-xl font-semibold text-black">{selectedCustomer.fullName || 'N/A'}</h4>
+                  <p className="text-gray-600 mt-1">{selectedCustomer.email || 'N/A'}</p>
                 </div>
-                
+
                 <div className="space-y-4 mb-6">
                   <div className="flex items-center">
                     <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-gray-600 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
                     </svg>
-                    <span className="text-black">{selectedCustomer.phone}</span>
-                  </div>
-                  <div className="flex items-center">
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-gray-600 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-                    </svg>
-                    <span className="text-black">{selectedCustomer.location}</span>
+                    <span className="text-black">{selectedCustomer.phoneNumber || 'N/A'}</span>
                   </div>
                   <div className="flex items-center">
                     <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-gray-600 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                     </svg>
-                    <span className="text-black">Joined {formatDate(selectedCustomer.joinDate)}</span>
+                    <span className="text-black">Joined: {formatDate(selectedCustomer.createdAt)}</span> {/* Use createdAt */}
                   </div>
                 </div>
-                
-                <div className="bg-softOrange/20 rounded-xl p-4 mb-6">
-                  <h5 className="text-black font-medium mb-3">Order Statistics</h5>
-                  <div className="grid grid-cols-2 gap-4">
-                    <div>
-                      <p className="text-gray-600 text-sm">Total Orders</p>
-                      <p className="text-xl font-semibold text-black">{selectedCustomer.orders}</p>
-                    </div>
-                    <div>
-                      <p className="text-gray-600 text-sm">Total Spent</p>
-                      <p className="text-xl font-semibold text-black">{formatCurrency(selectedCustomer.totalSpent)}</p>
-                    </div>
-                    <div>
-                      <p className="text-gray-600 text-sm">Avg. Order Value</p>
-                      <p className="text-xl font-semibold text-black">
-                        {formatCurrency(selectedCustomer.totalSpent / selectedCustomer.orders)}
-                      </p>
-                    </div>
-                    <div>
-                      <p className="text-gray-600 text-sm">Last Order</p>
-                      <p className="text-xl font-semibold text-black">{timeAgo(selectedCustomer.lastOrder)}</p>
-                    </div>
-                  </div>
-                </div>
-                
+
                 <div className="flex space-x-3">
-                  <button className="flex-1 px-4 py-2 bg-gradient-to-r from-softOrange via-vibrantOrange to-softOrange hover:from-vibrantOrange hover:to-softOrange text-white font-medium rounded-lg transition duration-300 flex items-center justify-center">
+                  <button
+                    onClick={handleWhatsappContact}
+                    className="flex-1 px-4 py-2 bg-gradient-to-r from-softOrange via-vibrantOrange to-softOrange hover:from-vibrantOrange hover:to-softOrange text-white font-medium rounded-lg transition duration-300 flex items-center justify-center"
+                  >
                     <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
                     </svg>
-                    Contact
-                  </button>
-                  <button className="flex-1 px-4 py-2 bg-softOrange/40 hover:bg-softOrange text-black font-medium rounded-lg transition duration-300 flex items-center justify-center">
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
-                    </svg>
-                    Orders
+                    Contact on WhatsApp
                   </button>
                 </div>
               </div>
