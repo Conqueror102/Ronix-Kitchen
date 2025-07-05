@@ -38,7 +38,6 @@ export const {
   adminLogout 
 } = adminSlice.actions;
 
-// Selectors
 export const selectAdminStatus = (state) => state.admin.status;
 export const selectAdminData = (state) => state.admin.adminData;
 export const selectAdminError = (state) => state.admin.error;

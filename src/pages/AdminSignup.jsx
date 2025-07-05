@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react'; // Import useState
 import { useNavigate, Link } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { useAdminAuth } from '../features/useAdminAuth';
@@ -15,6 +15,10 @@ export default function AdminSignup() {
   const password = watch("password");
   const [successMessage, setSuccessMessage] = React.useState("");
 
+  // New state for password visibility
+  const [passwordVisible, setPasswordVisible] = useState(false);
+  const [confirmPasswordVisible, setConfirmPasswordVisible] = useState(false);
+
   React.useEffect(() => {
     if (isAdmin) {
       navigate('/admin/dashboard');
@@ -24,7 +28,6 @@ export default function AdminSignup() {
   const onSubmit = async (data) => {
     try {
       setSuccessMessage("Creating admin account...");
-      // Add role to the signup data
       const adminData = {
         ...data,
         role: 'admin'
@@ -32,13 +35,27 @@ export default function AdminSignup() {
       await signup(adminData);
       setSuccessMessage("Admin account created successfully! Redirecting to dashboard...");
     } catch (error) {
-      setSuccessMessage("");
+      // Access the actual error message from the backend if available
+      const errorMessage = error.data?.message || 'Failed to create admin account. Please try again.';
+      setSuccessMessage(""); // Clear success message on error
       console.error('Signup error:', error);
+      // It's good practice to display this error to the user via the Redux state or local state
+      // For now, it will rely on the `error` from Redux (selectAdminError)
     }
   };
 
+  // Toggle function for main password field
+  const togglePasswordVisibility = () => {
+    setPasswordVisible(prev => !prev);
+  };
+
+  // Toggle function for confirm password field
+  const toggleConfirmPasswordVisibility = () => {
+    setConfirmPasswordVisible(prev => !prev);
+  };
+
   return (
-    <div className="min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8 bg-lightOrange">
+    <div className="min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8 bg-lightOrange font-inter"> {/* Added font-inter for consistency */}
       <div className="max-w-md w-full border border-softPeach bg-white rounded-xl shadow-lg p-8">
         <div className="flex flex-col items-center mb-8">
           <Link to="/" className="flex items-center mb-3">
@@ -65,6 +82,7 @@ export default function AdminSignup() {
             </div>
           )}
 
+          {/* This `error` comes from Redux (selectAdminError) */}
           {error && (
             <div className="mb-6 p-3 rounded-lg bg-red-100 border border-red-400 text-red-700 text-sm font-medium">
               {error}
@@ -72,6 +90,7 @@ export default function AdminSignup() {
           )}
 
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+            {/* Full Name Field */}
             <div>
               <label htmlFor="fullName" className="block text-sm font-medium text-black mb-1">
                 Full Name
@@ -94,6 +113,7 @@ export default function AdminSignup() {
               )}
             </div>
 
+            {/* Email Field */}
             <div>
               <label htmlFor="email" className="block text-sm font-medium text-black mb-1">
                 Email
@@ -116,6 +136,7 @@ export default function AdminSignup() {
               )}
             </div>
 
+            {/* Phone Number Field */}
             <div>
               <label htmlFor="phoneNumber" className="block text-sm font-medium text-black mb-1">
                 Phone Number
@@ -138,42 +159,84 @@ export default function AdminSignup() {
               )}
             </div>
 
+            {/* Password Field with Toggle */}
             <div>
               <label htmlFor="password" className="block text-sm font-medium text-black mb-1">
                 Password
               </label>
-              <input
-                id="password"
-                type="password"
-                className={`w-full bg-lightOrange border ${errors.password ? 'border-red-500' : 'border-softPeach'} rounded-lg px-4 py-2 text-black placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-vibrantOrange focus:border-transparent transition-colors`}
-                placeholder="••••••••"
-                {...register('password', {
-                  required: 'Password is required',
-                  minLength: {
-                    value: 6,
-                    message: 'Password must be at least 6 characters'
-                  }
-                })}
-              />
+              <div className="relative">
+                <input
+                  id="password"
+                  type={passwordVisible ? 'text' : 'password'}
+                  className={`w-full bg-lightOrange border ${errors.password ? 'border-red-500' : 'border-softPeach'} rounded-lg px-4 py-2 pr-10 text-black placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-vibrantOrange focus:border-transparent transition-colors`}
+                  placeholder="••••••••"
+                  {...register('password', {
+                    required: 'Password is required',
+                    minLength: {
+                      value: 6,
+                      message: 'Password must be at least 6 characters'
+                    }
+                  })}
+                />
+                <button
+                  type="button"
+                  onClick={togglePasswordVisibility}
+                  className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-500 hover:text-vibrantOrange focus:outline-none"
+                  aria-label={passwordVisible ? "Hide password" : "Show password"}
+                >
+                  {passwordVisible ? (
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                    </svg>
+                  ) : (
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.542-7 .472-1.579 1.253-3.091 2.384-4.36M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M1.667 4.088c-1.54 1.54-1.54 4.088 0 5.628l2.548 2.548a10.035 10.035 0 00-.001 2.544M22.333 19.912c1.54-1.54 1.54-4.088 0-5.628l-2.548-2.548a10.035 10.035 0 01-.001-2.544M12 21a9 9 0 01-9-9c0-.987.16-1.93.458-2.825m18.084 5.65c.298.895.458 1.838.458 2.825a9 9 0 01-9 9" />
+                    </svg>
+                  )}
+                </button>
+              </div>
               {errors.password && (
                 <p className="mt-1 text-sm text-red-600 font-medium">{errors.password.message}</p>
               )}
             </div>
 
+            {/* Confirm Password Field with Toggle */}
             <div>
               <label htmlFor="confirmPassword" className="block text-sm font-medium text-black mb-1">
                 Confirm Password
               </label>
-              <input
-                id="confirmPassword"
-                type="password"
-                className={`w-full bg-lightOrange border ${errors.confirmPassword ? 'border-red-500' : 'border-softPeach'} rounded-lg px-4 py-2 text-black placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-vibrantOrange focus:border-transparent transition-colors`}
-                placeholder="••••••••"
-                {...register('confirmPassword', {
-                  required: 'Please confirm your password',
-                  validate: value => value === password || "Passwords do not match"
-                })}
-              />
+              <div className="relative">
+                <input
+                  id="confirmPassword"
+                  type={confirmPasswordVisible ? 'text' : 'password'}
+                  className={`w-full bg-lightOrange border ${errors.confirmPassword ? 'border-red-500' : 'border-softPeach'} rounded-lg px-4 py-2 pr-10 text-black placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-vibrantOrange focus:border-transparent transition-colors`}
+                  placeholder="••••••••"
+                  {...register('confirmPassword', {
+                    required: 'Please confirm your password',
+                    validate: value => value === password || "Passwords do not match"
+                  })}
+                />
+                <button
+                  type="button"
+                  onClick={toggleConfirmPasswordVisibility}
+                  className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-500 hover:text-vibrantOrange focus:outline-none"
+                  aria-label={confirmPasswordVisible ? "Hide confirm password" : "Show confirm password"}
+                >
+                  {confirmPasswordVisible ? (
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                    </svg>
+                  ) : (
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.542-7 .472-1.579 1.253-3.091 2.384-4.36M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M1.667 4.088c-1.54 1.54-1.54 4.088 0 5.628l2.548 2.548a10.035 10.035 0 00-.001 2.544M22.333 19.912c1.54-1.54 1.54-4.088 0-5.628l-2.548-2.548a10.035 10.035 0 01-.001-2.544M12 21a9 9 0 01-9-9c0-.987.16-1.93.458-2.825m18.084 5.65c.298.895.458 1.838.458 2.825a9 9 0 01-9 9" />
+                    </svg>
+                  )}
+                </button>
+              </div>
               {errors.confirmPassword && (
                 <p className="mt-1 text-sm text-red-600 font-medium">{errors.confirmPassword.message}</p>
               )}
@@ -203,4 +266,4 @@ export default function AdminSignup() {
       </div>
     </div>
   );
-} 
+}

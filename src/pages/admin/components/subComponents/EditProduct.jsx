@@ -1,28 +1,68 @@
 import React, { useState, useEffect } from 'react';
 import { useForm } from "react-hook-form";
-// import productsService from '../../../../firebase/ProductsService';
-// import categoryService from '../../../../firebase/CategoryService'; 
+// Import RTK Query hooks
+import {
+  useGetProductsAdminQuery,
+  useUpdateProductMutation,
+  useGetProductsByCategoryQuery // Assuming this is the hook for fetching categories
+} from '../../../../features/RTKQUERY'; // Adjust path if needed
 
 function EditProduct() {
-  const [products, setProducts] = useState([]);
+  // RTK Query hooks for data fetching
+  const {
+    data: productsData,
+    isLoading: areProductsLoading,
+    isError: productsFetchError,
+    error: productsErrorDetails,
+    // refetch: refetchProducts // Not explicitly needed if invalidatesTags is set up for mutations
+  } = useGetProductsAdminQuery();
+
+  const {
+    data: categoriesData,
+    isLoading: areCategoriesLoading,
+    isError: categoriesFetchError,
+    error: categoriesErrorDetails,
+  } = useGetProductsByCategoryQuery(); // Call the hook with ()
+
+  // RTK Query hook for mutation
+  const [
+    updateProductMutation, // This is the function to call for updating
+    {
+      isLoading: isUpdatingProduct, // Renamed from isSubmitting
+      isSuccess: updateSuccess,
+      isError: updateError,
+      error: updateErrorData,
+      reset: resetUpdateMutationState // To reset mutation state after success/error
+    }
+  ] = useUpdateProductMutation();
+
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [imagePreview, setImagePreview] = useState(null);
-  const [isLoading, setIsLoading] = useState(true);
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [submitSuccess, setSubmitSuccess] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
-  
-  const [categories, setCategories] = useState([]);
-  const [categoriesLoading, setCategoriesLoading] = useState(true);
-  
-  const { 
-    register, 
-    handleSubmit, 
+  const [feedbackMessage, setFeedbackMessage] = useState(''); // Unified message for success/error
+
+  // Initialize react-hook-form
+  const {
+    register,
+    handleSubmit,
     reset,
     setValue,
-    formState: { errors } 
+    formState: { errors }
   } = useForm();
-  
+
+  // Combined loading state for initial data fetch
+  const isLoadingInitialData = areProductsLoading || areCategoriesLoading;
+
+  // Combine fetch errors
+  const fetchError = productsFetchError || categoriesFetchError ?
+    (productsErrorDetails?.data?.message || categoriesErrorDetails?.data?.message || 'Failed to load data.') : null;
+
+  // Extract products and categories from RTK Query data
+  const products = productsData?.product || [];
+  console.log(products)
+  const categories = (categoriesData || []).filter(cat => cat.active); // Filter active categories if needed
+
+  // CSS for hiding scrollbar (can be moved to a CSS file for larger projects)
   const scrollbarHideStyles = `
     .hide-scrollbar {
       -ms-overflow-style: none;  /* IE and Edge */
@@ -32,117 +72,103 @@ function EditProduct() {
       display: none;             /* Chrome, Safari and Opera */
     }
   `;
-  
-  useEffect(() => {
-    const fetchProducts = async () => {
-      try {
-        setIsLoading(true);
-        // Replace with your API call
-        // const productsData = await fetch('/api/products').then(res => res.json());
-        // setProducts(productsData);
-        // Demo data:
-        setProducts([
-          {
-            id: 1,
-            name: "Classic Ramen",
-            price: 12.99,
-            description: "Delicious ramen with pork broth.",
-            image: "/images/ramen1.jpg",
-            category: "ramen",
-            featured: true,
-            inStock: true
-          }
-        ]);
-      } catch (error) {
-        console.error('Failed to load products:', error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-    
-    fetchProducts();
-  }, []);
-  
-  useEffect(() => {
-    const fetchCategories = async () => {
-      try {
-        setCategoriesLoading(true);
-        // Replace with your API call
-        // const categoriesData = await fetch('/api/categories').then(res => res.json());
-        // const activeCategories = categoriesData.filter(category => category.active);
-        // setCategories(activeCategories);
-        setCategories([
-          { id: 1, name: "Ramen", active: true },
-          { id: 2, name: "Sushi", active: true }
-        ]);
-      } catch (error) {
-        console.error('Failed to load categories:', error);
-      } finally {
-        setCategoriesLoading(false);
-      }
-    };
-    
-    fetchCategories();
-  }, []);
 
-  const filteredProducts = products.filter(product => 
-    product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    product.category.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    product.description.toLowerCase().includes(searchTerm.toLowerCase())
-  );
-  
+  // Filter products based on search term (name, category, description)
+  const filteredProducts = products.filter(product => {
+    const productName = product.productName ?? ''; // Use productName as per AddProduct
+    const productDescription = product.description ?? '';
+    const productCategory = product.category ?? '';
+
+    return productName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+           productDescription.toLowerCase().includes(searchTerm.toLowerCase()) ||
+           productCategory.toLowerCase().includes(searchTerm.toLowerCase());
+  });
+
+  // Effect to handle success/error feedback from the update mutation
+  useEffect(() => {
+    if (updateSuccess) {
+      setFeedbackMessage('Product updated successfully!');
+      resetUpdateMutationState(); // Clear mutation state
+      const timer = setTimeout(() => setFeedbackMessage(''), 3000); // Clear after 3 seconds
+      return () => clearTimeout(timer);
+    }
+    if (updateError) {
+      console.error('Error updating product:', updateErrorData);
+      let errorMessage = 'Failed to update product.';
+      if (updateErrorData?.data?.message) {
+        errorMessage = `Failed to update: ${updateErrorData.data.message}`;
+      } else if (updateErrorData?.error) {
+        errorMessage = `Update error: ${updateErrorData.error}`;
+      }
+      setFeedbackMessage(errorMessage);
+      resetUpdateMutationState(); // Clear mutation state
+      const timer = setTimeout(() => setFeedbackMessage(''), 5000); // Keep error longer
+      return () => clearTimeout(timer);
+    }
+  }, [updateSuccess, updateError, updateErrorData, resetUpdateMutationState]);
+
+  // Handle selecting a product from the list
   const handleSelectProduct = (product) => {
     setSelectedProduct(product);
-    setImagePreview(product.image);
-    
-    setValue('productName', product.name);
+    // Use product.image[0] if image is an array, otherwise product.image
+    setImagePreview(product.image && product.image.length > 0 ? product.image[0] : null);
+
+    // Set form values using react-hook-form's setValue
+    setValue('productName', product.productName); // Use productName
     setValue('productPrice', product.price);
     setValue('productDescription', product.description);
     setValue('category', product.category);
     setValue('featured', product.featured ? 'true' : 'false');
     setValue('inStock', product.inStock ? 'true' : 'false');
   };
-  
+
+  // Handle image file input change
   const handleImageChange = (e) => {
     const file = e.target.files[0];
     if (file) {
       const reader = new FileReader();
       reader.onloadend = () => {
-        setImagePreview(reader.result);
+        setImagePreview(reader.result); // This will be a base64 string
       };
       reader.readAsDataURL(file);
+    } else {
+      setImagePreview(selectedProduct?.image && selectedProduct.image.length > 0 ? selectedProduct.image[0] : null);
     }
   };
-  
-  const updateProduct = async (data) => {
-    if (!selectedProduct) return;
-    setIsSubmitting(true);
-    const updatedProduct = {
-      ...selectedProduct,
-      name: data.productName,
+
+  // Function to handle product update (triggered by form submission)
+  const onSubmitUpdateProduct = async (data) => {
+    if (!selectedProduct) return; // Ensure a product is selected
+
+    // Construct the payload for the update mutation
+    const updatedProductPayload = {
+      // Assuming your updateProductMutation expects an 'id' and the updated fields
+      id: selectedProduct._id, // Use _id from MongoDB
+      productName: data.productName,
       price: data.productPrice,
       description: data.productDescription,
-      image: imagePreview,
+      // Pass the new image data. If imagePreview is base64, your backend needs to handle it.
+      // If no new image selected, retain the old one.
+      image: imagePreview, // This will be the base64 string or original URL
       category: data.category,
       featured: data.featured === 'true',
       inStock: data.inStock === 'true',
-      dateUpdated: new Date().toISOString()
+      // You might not need to send dateUpdated from frontend unless backend expects it
+      // dateUpdated: new Date().toISOString() 
     };
-    
+
     try {
-      // Replace with your API call
-      // await fetch(`/api/products/${selectedProduct.id}`, { method: 'PUT', body: JSON.stringify(updatedProduct) });
-      setProducts(products.map(p => 
-        p.id === selectedProduct.id ? updatedProduct : p
-      ));
-      setSubmitSuccess(true);
-      setTimeout(() => {
-        setSubmitSuccess(false);
-      }, 3000);
+      // Call the RTK Query mutation
+      await updateProductMutation(updatedProductPayload).unwrap();
+      // RTK Query's cache invalidation should automatically refetch products
+      // so you don't need to manually update the 'products' state array here.
+      // After successful update, re-select the product to reflect latest changes (if any beyond form fields)
+      // This is important if your backend sends back a slightly different product object after update
+      setSelectedProduct(prev => ({ ...prev, ...updatedProductPayload })); // Basic update for local state
+      // A full refetch of all products via RTK Query would be handled by invalidatesTags
     } catch (error) {
-      console.error('Failed to update product:', error);
-    } finally {
-      setIsSubmitting(false);
+      // Errors are handled by the useEffect above
+      console.error("Failed to submit update:", error);
     }
   };
 
@@ -150,7 +176,7 @@ function EditProduct() {
     <div className='flex flex-col space-y-6 max-w-6xl mx-auto'>
       {/* Add the scrollbar hiding styles */}
       <style>{scrollbarHideStyles}</style>
-      
+
       {/* Header */}
       <div className="bg-white/90 rounded-xl shadow-md overflow-hidden">
         <div className="p-6">
@@ -184,13 +210,13 @@ function EditProduct() {
         </div>
       </div>
 
-      {/* Success Message */}
-      {submitSuccess && (
-        <div className="bg-green-500/10 text-green-600 px-4 py-3 rounded-lg flex items-center">
+      {/* Feedback Message (Success/Error from mutations) */}
+      {feedbackMessage && (
+        <div className={`px-4 py-3 rounded-lg flex items-center ${updateSuccess ? 'bg-green-500/10 text-green-600' : 'bg-red-500/10 text-red-600'}`}>
           <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={updateSuccess ? "M5 13l4 4L19 7" : "M10 14l2-2m0 0l2-2m-2 2L10 6m2 6l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"} />
           </svg>
-          <span>Product updated successfully!</span>
+          <span>{feedbackMessage}</span>
         </div>
       )}
 
@@ -201,8 +227,8 @@ function EditProduct() {
           <div className="px-6 py-4 border-b border-softOrange/40">
             <h3 className="text-lg font-semibold text-black">Select a Product</h3>
           </div>
-          
-          {isLoading ? (
+
+          {isLoadingInitialData ? (
             <div className="p-6 flex justify-center flex-grow">
               <div className="flex items-center space-x-2">
                 <svg className="animate-spin h-5 w-5 text-vibrantOrange" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
@@ -212,28 +238,33 @@ function EditProduct() {
                 <span className="text-vibrantOrange">Loading products...</span>
               </div>
             </div>
+          ) : fetchError ? (
+             <div className="p-6 text-center flex-grow flex flex-col justify-center text-red-600">
+               <h3 className="text-lg font-semibold mb-2">Error Loading Products</h3>
+               <p className="text-sm">{fetchError}</p>
+             </div>
           ) : (
             <>
               {filteredProducts.length > 0 ? (
                 <div className="divide-y divide-softOrange/40 overflow-y-auto hide-scrollbar flex-grow">
                   {filteredProducts.map(product => (
-                    <div 
-                      key={product.id}
+                    <div
+                      key={product._id} // Use product._id for consistency
                       onClick={() => handleSelectProduct(product)}
-                      className={`p-4 cursor-pointer hover:bg-softOrange/20 transition-colors ${selectedProduct?.id === product.id ? 'bg-softOrange/40' : ''}`}
+                      className={`p-4 cursor-pointer hover:bg-softOrange/20 transition-colors ${selectedProduct?._id === product._id ? 'bg-softOrange/40' : ''}`}
                     >
                       <div className="flex items-center">
                         <div className="h-12 w-12 rounded-md overflow-hidden flex-shrink-0">
-                          <img 
-                            src={product.image} 
-                            alt={product.name} 
+                          <img
+                            src={product.image && product.image.length > 0 ? product.image[0] : 'https://placehold.co/48x48/F7F7F7/AAAAAA?text=NoImg'}
+                            alt={product.productName || 'Product Image'} // Use productName
                             className="h-full w-full object-cover"
                           />
                         </div>
                         <div className="ml-4 flex-1">
                           <div className="flex justify-between">
-                            <h4 className="text-black font-medium">{product.name}</h4>
-                            <span className="text-vibrantOrange font-medium">${product.price.toFixed(2)}</span>
+                            <h4 className="text-black font-medium">{product.productName}</h4> {/* Use productName */}
+                            <span className="text-vibrantOrange font-medium">${(product.price || 0).toFixed(2)}</span>
                           </div>
                           <p className="text-gray-600 text-sm truncate mt-1">{product.description}</p>
                           <div className="flex items-center mt-2">
@@ -267,7 +298,7 @@ function EditProduct() {
               )}
             </>
           )}
-          
+
           {filteredProducts.length > 0 && (
             <div className="px-6 py-4 bg-softOrange/10 border-t border-softOrange/40 mt-auto">
               <p className="text-sm text-gray-600">
@@ -277,7 +308,7 @@ function EditProduct() {
             </div>
           )}
         </div>
-        
+
         {/* Edit form */}
         <div className="lg:col-span-2">
           {selectedProduct ? (
@@ -286,14 +317,14 @@ function EditProduct() {
                 <h3 className="text-lg font-semibold text-black">Edit Product Information</h3>
               </div>
               <div className="p-6">
-                <form onSubmit={handleSubmit(updateProduct)} className="space-y-6">
+                <form onSubmit={handleSubmit(onSubmitUpdateProduct)} className="space-y-6">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
-                      <label className="block text-black mb-2 font-medium">Product Name</label>
-                      <input 
-                        type="text" 
+                      <label htmlFor="productName" className="block text-black mb-2 font-medium">Product Name</label>
+                      <input
+                        type="text"
                         id="productName"
-                        placeholder="Enter product name" 
+                        placeholder="Enter product name"
                         className={`w-full bg-softOrange/40 text-black px-4 py-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-vibrantOrange ${errors.productName ? 'border border-red-500' : ''}`}
                         {...register("productName", { required: true })}
                       />
@@ -301,16 +332,16 @@ function EditProduct() {
                         <span className="text-red-500 text-sm mt-1">Product name is required</span>
                       )}
                     </div>
-                    
+
                     <div>
-                      <label className="block text-black mb-2 font-medium">Product Price (USD)</label>
-                      <input 
-                        type="number" 
+                      <label htmlFor="productPrice" className="block text-black mb-2 font-medium">Product Price (USD)</label>
+                      <input
+                        type="number"
                         id="productPrice"
                         step="0.01"
-                        placeholder="0.00" 
+                        placeholder="0.00"
                         className={`w-full bg-softOrange/40 text-black px-4 py-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-vibrantOrange ${errors.productPrice ? 'border border-red-500' : ''}`}
-                        {...register("productPrice", { 
+                        {...register("productPrice", {
                           required: true,
                           min: 0.01,
                           valueAsNumber: true
@@ -321,23 +352,23 @@ function EditProduct() {
                       )}
                     </div>
                   </div>
-                  
+
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
-                      <label className="block text-black mb-2 font-medium">Category</label>
-                      <select 
+                      <label htmlFor="category" className="block text-black mb-2 font-medium">Category</label>
+                      <select
                         id="category"
                         className="w-full bg-softOrange/40 text-black px-4 py-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-vibrantOrange"
                         {...register("category", { required: true })}
-                        disabled={categoriesLoading}
+                        disabled={areCategoriesLoading}
                       >
                         <option value="">Select a category</option>
-                        
-                        {categoriesLoading ? (
+
+                        {areCategoriesLoading ? (
                           <option value="" disabled>Loading categories...</option>
                         ) : categories.length > 0 ? (
                           categories.map(category => (
-                            <option key={category.id} value={category.name.toLowerCase()}>
+                            <option key={category._id || category.id} value={category.name?.toLowerCase()}>
                               {category.name}
                             </option>
                           ))
@@ -345,8 +376,8 @@ function EditProduct() {
                           <option value="" disabled>No categories available</option>
                         )}
                       </select>
-                      
-                      {categoriesLoading && (
+
+                      {areCategoriesLoading && (
                         <div className="mt-1 flex items-center">
                           <svg className="animate-spin h-4 w-4 text-vibrantOrange mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                             <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
@@ -355,29 +386,29 @@ function EditProduct() {
                           <span className="text-sm text-gray-600">Loading available categories...</span>
                         </div>
                       )}
-                      
+
                       {errors.category && (
                         <span className="text-red-500 text-sm mt-1">Please select a category</span>
                       )}
                     </div>
-                    
+
                     <div className="grid grid-cols-2 gap-4">
                       <div>
                         <label className="block text-black mb-2 font-medium">Featured</label>
                         <div className="flex space-x-4">
                           <label className="flex items-center">
-                            <input 
-                              type="radio" 
-                              value="true" 
+                            <input
+                              type="radio"
+                              value="true"
                               className="form-radio h-4 w-4 text-vibrantOrange bg-softOrange border-softOrange focus:ring-0"
                               {...register("featured")}
                             />
                             <span className="ml-2 text-black">Yes</span>
                           </label>
                           <label className="flex items-center">
-                            <input 
-                              type="radio" 
-                              value="false" 
+                            <input
+                              type="radio"
+                              value="false"
                               className="form-radio h-4 w-4 text-vibrantOrange bg-softOrange border-softOrange focus:ring-0"
                               {...register("featured")}
                             />
@@ -385,23 +416,23 @@ function EditProduct() {
                           </label>
                         </div>
                       </div>
-                      
+
                       <div>
                         <label className="block text-black mb-2 font-medium">In Stock</label>
                         <div className="flex space-x-4">
                           <label className="flex items-center">
-                            <input 
-                              type="radio" 
-                              value="true" 
+                            <input
+                              type="radio"
+                              value="true"
                               className="form-radio h-4 w-4 text-green-500 bg-softOrange border-softOrange focus:ring-0"
                               {...register("inStock")}
                             />
                             <span className="ml-2 text-black">Yes</span>
                           </label>
                           <label className="flex items-center">
-                            <input 
-                              type="radio" 
-                              value="false" 
+                            <input
+                              type="radio"
+                              value="false"
                               className="form-radio h-4 w-4 text-red-500 bg-softOrange border-softOrange focus:ring-0"
                               {...register("inStock")}
                             />
@@ -411,13 +442,13 @@ function EditProduct() {
                       </div>
                     </div>
                   </div>
-                  
+
                   <div>
-                    <label className="block text-black mb-2 font-medium">Description</label>
-                    <textarea 
+                    <label htmlFor="productDescription" className="block text-black mb-2 font-medium">Description</label>
+                    <textarea
                       id="productDescription"
                       rows="4"
-                      placeholder="Describe your product..." 
+                      placeholder="Describe your product..."
                       className={`w-full bg-softOrange/40 text-black px-4 py-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-vibrantOrange ${errors.productDescription ? 'border border-red-500' : ''} hide-scrollbar`}
                       {...register("productDescription", { required: true, minLength: 10 })}
                     ></textarea>
@@ -425,7 +456,7 @@ function EditProduct() {
                       <span className="text-red-500 text-sm mt-1">Description should be at least 10 characters</span>
                     )}
                   </div>
-                  
+
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
                       <label className="block text-black mb-2 font-medium">Product Image</label>
@@ -451,10 +482,10 @@ function EditProduct() {
                               className="relative cursor-pointer bg-softOrange rounded-md font-medium text-vibrantOrange hover:text-white hover:bg-vibrantOrange focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-vibrantOrange"
                             >
                               <span className="px-3 py-2 rounded-md">Change image</span>
-                              <input 
-                                id="file-upload" 
-                                name="file-upload" 
-                                type="file" 
+                              <input
+                                id="file-upload"
+                                name="file-upload"
+                                type="file"
                                 className="sr-only"
                                 accept="image/*"
                                 onChange={handleImageChange}
@@ -466,7 +497,7 @@ function EditProduct() {
                         </div>
                       </div>
                     </div>
-                    
+
                     <div>
                       <label className="block text-black mb-2 font-medium">Image Preview</label>
                       {imagePreview ? (
@@ -484,14 +515,14 @@ function EditProduct() {
                       )}
                     </div>
                   </div>
-                  
+
                   <div className="flex gap-4 pt-4">
                     <button
                       type="submit"
-                      disabled={isSubmitting}
-                      className={`flex-1 px-4 py-3 bg-black hover:bg-gray-900 text-white font-medium rounded-lg transition duration-300 flex items-center justify-center ${isSubmitting ? 'opacity-70 cursor-not-allowed' : ''}`}
+                      disabled={isUpdatingProduct}
+                      className={`flex-1 px-4 py-3 bg-black hover:bg-gray-900 text-white font-medium rounded-lg transition duration-300 flex items-center justify-center ${isUpdatingProduct ? 'opacity-70 cursor-not-allowed' : ''}`}
                     >
-                      {isSubmitting ? (
+                      {isUpdatingProduct ? (
                         <>
                           <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                             <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
@@ -508,7 +539,7 @@ function EditProduct() {
                         </>
                       )}
                     </button>
-                    
+
                     <button
                       type="button"
                       onClick={() => setSelectedProduct(null)}

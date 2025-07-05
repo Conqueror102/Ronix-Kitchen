@@ -5,7 +5,7 @@ function Dashboard() {
   const cardItems = [
     { 
       title: 'Products', 
-      slug: 'products',
+      slug: '/admin/products',
       icon: (
         <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 mb-2 text-vibrantOrange" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 17V7m0 10a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2h2a2 2 0 012 2m0 10a2 2 0 002 2h2a2 2 0 002-2M9 7a2 2 0 012-2h2a2 2 0 012 2m0 10V7m0 10a2 2 0 002 2h2a2 2 0 002-2V7a2 2 0 00-2-2h-2a2 2 0 00-2 2" />
@@ -17,7 +17,7 @@ function Dashboard() {
     },
     { 
       title: 'Orders', 
-      slug: 'orders',
+      slug: '/admin/orders',
       icon: (
         <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 mb-2 text-vibrantOrange" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
@@ -29,7 +29,7 @@ function Dashboard() {
     },
     { 
       title: 'Customers', 
-      slug: 'customers',
+      slug: '/admin/customers',
       icon: (
         <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 mb-2 text-vibrantOrange" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
@@ -41,7 +41,7 @@ function Dashboard() {
     },
     { 
       title: 'Restaurants', 
-      slug: 'restaurants',
+      slug: '/admin/restaurants',
       icon: (
         <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 mb-2 text-vibrantOrange" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
