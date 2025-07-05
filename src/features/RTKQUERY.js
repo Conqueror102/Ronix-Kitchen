@@ -8,19 +8,20 @@ export const apiSlice = createApi({
   baseQuery: fetchBaseQuery({
     baseUrl,
     prepareHeaders: (headers, { getState }) => {
-      const authToken = getState().auth?.token;
-      const adminToken = getState().admin?.adminData?.token;
-      const token = authToken || adminToken;
-      
+      const authToken = getState().auth?.token; // User token
+      const adminToken = getState().admin?.adminData?.token; // Admin token
+      const token = authToken || adminToken; // Prioritize admin token if both exist, or use user token
+
       if (token) {
         headers.set("Authorization", `Bearer ${token}`);
       }
       return headers;
     },
   }),
-  tagTypes: ['Product', 'Category', 'Cart'],
+  // Define tag types for cache invalidation
+  tagTypes: ["Product", "Category", "Cart", "Order", "User"], // Ensure all relevant tags are here
   endpoints: (builder) => ({
-    // ADMIN ROUTES
+    // --- ADMIN AUTH ROUTES ---
     loginAdmin: builder.mutation({
       query: (credentials) => ({
         url: "/admin/login",
@@ -28,8 +29,15 @@ export const apiSlice = createApi({
         body: credentials,
       }),
     }),
+    signUpAdmin: builder.mutation({
+      query: (newUser) => ({
+        url: "/admin/signUp",
+        method: "POST",
+        body: newUser,
+      }),
+    }),
 
-    // USER ROUTES
+    // --- USER AUTH ROUTES ---
     loginUser: builder.mutation({
       query: (credentials) => ({
         url: "/users/login",
@@ -46,29 +54,13 @@ export const apiSlice = createApi({
       }),
     }),
 
-    // CART ROUTES
+    // --- CART ROUTES ---
     getCart: builder.query({
       query: () => ({
         url: "/users/get-cart",
         method: "GET",
       }),
-      providesTags: ['Cart'],
-    }),
-
-    // PRODUCT ROUTES
-    getAllProducts: builder.query({
-      query: () => 'users/all-product',
-      providesTags: ['Product']
-    }),
-
-    getProductById: builder.query({
-      query: (id) => `/users/products/${id}`,
-      providesTags: (result, error, id) => [{ type: 'Product', id }]
-    }),
-
-    getProductsByCategory: builder.query({
-      query: (category) => `/users/getByCategory?category=${category}`,
-      providesTags: ['Product']
+      providesTags: ["Cart"], // This query provides data tagged as "Cart"
     }),
 
     addToCart: builder.mutation({
@@ -77,6 +69,16 @@ export const apiSlice = createApi({
         method: "POST",
         body: { productId, qty },
       }),
+      invalidatesTags: ["Cart"], 
+    }),
+
+    updateCartItem: builder.mutation({
+      query: ({ productId, qty }) => ({
+        url: "/users/updateCart",
+        method: "PATCH",
+        body: { productId, qty },
+      }),
+      invalidatesTags: ["Cart"], 
     }),
 
     removeFromCart: builder.mutation({
@@ -85,6 +87,7 @@ export const apiSlice = createApi({
         method: "DELETE",
         body: { productId },
       }),
+      invalidatesTags: ["Cart"],   
     }),
 
     createOrder: builder.mutation({
@@ -92,49 +95,159 @@ export const apiSlice = createApi({
         url: "/users/createOrder",
         method: "POST",
       }),
+      invalidatesTags: ["Cart", "Order"],
+    }),
+
+    getAllProducts: builder.query({
+      query: () => "users/get-all-products",
+      providesTags: ["Product"],
+    }),
+
+    getProductById: builder.query({
+      query: (id) => `/users/products/${id}`,
+      providesTags: (result, error, id) => [{ type: "Product", id }],
+    }),
+
+    getProductsByCategory: builder.query({
+      query: (category) => `/users/getByCategory?category=${category}`,
+      providesTags: (result, error, category) => [
+        { type: "Product", id: category },
+      ],
     }),
 
     createProduct: builder.mutation({
       query: (formData) => ({
-        url: "/users/create-product",
+        url: "/admin/createProduct",
         method: "POST",
         body: formData,
       }),
-      invalidatesTags: ['Product']
+      invalidatesTags: ["Product"],
+    }),
+
+    getProductsAdmin: builder.query({
+      query: () => "/admin/getAllProducts",
+      providesTags: ["Product"],
     }),
 
     updateProduct: builder.mutation({
-      query: (data) => ({
-        url: "/admin/updateProduct",
+      query: ({ id, ...patch }) => ({
+        url: `/admin/updateProduct/${id}`,
         method: "PATCH",
-        body: data,
+        body: patch,
       }),
-      invalidatesTags: (result, error, { id }) => [{ type: 'Product', id }]
+      invalidatesTags: (result, error, { id }) => [
+        "Product",
+        { type: "Product", id },
+      ],
     }),
 
-    deleteProduct: builder.mutation({
-      query: ({ id }) => ({
-        url: "/admin/deleteProduct",
+    deleteProducts: builder.mutation({
+      query: (idsArray) => ({
+        url: "/admin/deleteProducts",
         method: "DELETE",
-        body: { id },
+        body: { ids: idsArray },
       }),
-      invalidatesTags: ['Product']
+      invalidatesTags: ["Product"],
+    }),
+
+    getProductsByCategoryAdmin: builder.query({
+      query: (categoryName) => `/admin/getByCategory?category=${categoryName}`,
+      providesTags: ["Product"],
+    }),
+
+    createCategory: builder.mutation({
+      query: (newCategoryData) => ({
+        url: "/admin/categories",
+        method: "POST",
+        body: newCategoryData,
+      }),
+      invalidatesTags: ["Category"],
+    }),
+
+    getAllCategories: builder.query({
+      query: () => "/admin/categories",
+      providesTags: ["Category"],
+    }),
+    
+    getCategories: builder.query({ 
+      query: () => "/admin/categories",
+      providesTags: ["Category"],
+    }),
+
+    getCategoryById: builder.query({
+      query: (id) => `/admin/categories/${id}`,
+      providesTags: (result, error, id) => [{ type: "Category", id }],
+    }),
+
+    updateCategory: builder.mutation({
+      query: ({ id, ...patch }) => ({
+        url: `/admin/categories/${id}`,
+        method: "PATCH",
+        body: patch,
+      }),
+      invalidatesTags: (result, error, { id }) => [
+        "Category",
+        { type: "Category", id },
+      ],
+    }),
+
+    deleteCategory: builder.mutation({
+      query: (id) => ({
+        url: `/admin/categories/${id}`,
+        method: "DELETE",
+      }),
+      invalidatesTags: ["Category"],
+    }),
+
+    getAllOrdersAdmin: builder.query({
+      query: () => "/admin/getAllOrders",
+      providesTags: ["Order"],
+    }),
+
+    updateOrder: builder.mutation({
+      query: ({ id, ...patch }) => ({
+        url: `/admin/updateOrders/${id}`,
+        method: "PATCH",
+        body: patch,
+      }),
+      invalidatesTags: (result, error, { id }) => [
+        "Order",
+        { type: "Order", id },
+      ],
+    }),
+
+    getAllUsersAdmin: builder.query({
+      query: () => "/admin/getAllUsers",
+      providesTags: ["User"],
     }),
   }),
 });
 
 export const {
+  useLoginAdminMutation,
+  useSignUpAdminMutation,
+  useLoginUserMutation,
+  useSignUpUserMutation,
+  useGetCartQuery,
+  useAddToCartMutation,
+  useUpdateCartItemMutation,
+  useRemoveFromCartMutation,
+  useCreateOrderMutation,
   useGetAllProductsQuery,
   useGetProductByIdQuery,
   useGetProductsByCategoryQuery,
-  useLoginUserMutation,
-  useSignUpUserMutation,
-  useAddToCartMutation,
-  useRemoveFromCartMutation,
-  useCreateOrderMutation,
-  useLoginAdminMutation,
   useCreateProductMutation,
+  useGetProductsAdminQuery,
   useUpdateProductMutation,
-  useDeleteProductMutation,
-  useGetCartQuery,
+  useDeleteProductsMutation,
+  useGetProductsByCategoryAdminQuery,
+  useCreateCategoryMutation,
+  useGetAllCategoriesQuery,
+  useGetCategoryByIdQuery,
+  useGetAllOrdersAdminQuery,
+  useUpdateOrderMutation,
+  useUpdateCategoryMutation,
+  useGetAllUsersAdminQuery,
+  useDeleteCategoryMutation,
+  useGetCategoriesQuery,
 } = apiSlice;
