@@ -1,13 +1,11 @@
 import { createSlice } from '@reduxjs/toolkit';
 
-// Initial state
 const initialState = {
   selectedProduct: null,
   filteredProducts: [],
-  products: [], // Add this to store the products from RTK Query
+  products: [],
 };
 
-// Create the product slice
 const productSlice = createSlice({
   name: 'products',
   initialState,
@@ -34,7 +32,6 @@ const productSlice = createSlice({
   },
 });
 
-// Export actions and reducer
 export const { 
   setSelectedProduct, 
   clearSelectedProduct,

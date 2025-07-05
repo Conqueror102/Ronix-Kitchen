@@ -22,10 +22,13 @@ export default function ForgotPasswordPage() {
       //   body: JSON.stringify({ email: data.email })
       // });
       // const result = await response.json();
-      // if (!result.success) throw new Error(result.message || "Failed to send reset email.");
+      // if (!response.ok) { // Check response.ok for non-2xx status codes
+      //   throw new Error(result.message || "Failed to send reset email.");
+      // }
       // setSuccessMessage("Password reset email sent. Please check your inbox.");
 
       // Simulate success for UI
+      await new Promise(resolve => setTimeout(resolve, 1000)); // Simulate API call delay
       setSuccessMessage("Password reset email sent. Please check your inbox.");
     } catch (error) {
       setError(error.message || "Failed to send reset email. Please try again.");
@@ -35,14 +38,14 @@ export default function ForgotPasswordPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-900 py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-md w-full bg-gray-800/50 backdrop-blur-sm rounded-xl border border-gray-700 shadow-xl p-8">
+    <div className="min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8 bg-lightOrange font-inter"> {/* Changed background and added font */}
+      <div className="max-w-md w-full border border-softPeach bg-white rounded-xl shadow-lg p-8"> {/* Changed border and background */}
         <div className="text-center">
           <Link to="/" className="flex items-center justify-center mb-6">
-            <div className="w-12 h-12 rounded-full bg-gradient-to-r from-yellow-500 to-red-500 flex items-center justify-center text-white font-bold text-xl">R</div>
+            <div className="w-12 h-12 rounded-full bg-vibrantOrange flex items-center justify-center text-white font-bold text-xl">R</div> {/* Changed logo background */}
           </Link>
-          <h2 className="text-3xl font-extrabold text-white">Reset your password</h2>
-          <p className="mt-2 text-sm text-gray-400">
+          <h2 className="text-3xl font-extrabold text-vibrantOrange">Reset your password</h2> {/* Changed text color */}
+          <p className="mt-2 text-sm text-gray-700"> {/* Changed text color */}
             Enter your email and we'll send you a link to reset your password
           </p>
         </div>
@@ -50,21 +53,21 @@ export default function ForgotPasswordPage() {
         <form className="mt-8 space-y-5" onSubmit={handleSubmit(resetPassword)}>
           {/* Show error message if exists */}
           {error && (
-            <div className="p-3 rounded-lg bg-red-500/20 border border-red-500/30 text-red-200 text-sm">
+            <div className="p-3 rounded-lg bg-red-100 border border-red-400 text-red-700 text-sm font-medium"> {/* Updated error styling */}
               {error}
             </div>
           )}
 
           {/* Show success message if exists */}
           {successMessage && (
-            <div className="p-3 rounded-lg bg-green-500/20 border border-green-500/30 text-green-200 text-sm">
+            <div className="p-3 rounded-lg bg-green-100 border border-green-400 text-green-700 text-sm font-medium"> {/* Updated success styling */}
               {successMessage}
             </div>
           )}
 
           {/* Email Input */}
           <div className="space-y-2">
-            <label htmlFor="email" className="block text-sm font-medium text-gray-300">
+            <label htmlFor="email" className="block text-sm font-medium text-black"> {/* Changed text color */}
               Email Address
             </label>
             <input
@@ -78,12 +81,12 @@ export default function ForgotPasswordPage() {
                   message: "Please enter a valid email address",
                 },
               })}
-              className={`w-full px-4 py-3 bg-gray-800/60 border ${
-                errors.email ? "border-red-500" : "border-gray-700"
-              } rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-transparent transition-colors`}
+              className={`w-full px-4 py-2 bg-lightOrange border ${ /* Changed bg-gray-800/60 to bg-lightOrange, text-white to text-black, focus:ring-yellow-500 to focus:ring-vibrantOrange */
+                errors.email ? "border-red-500" : "border-softPeach" /* Changed border-gray-700 to border-softPeach */
+              } rounded-lg text-black placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-vibrantOrange focus:border-transparent transition-colors`}
             />
             {errors.email && (
-              <p className="mt-1 text-sm text-red-400">{errors.email.message}</p>
+              <p className="mt-1 text-sm text-red-600 font-medium">{errors.email.message}</p>
             )}
           </div>
 
@@ -91,7 +94,7 @@ export default function ForgotPasswordPage() {
           <button
             type="submit"
             disabled={isLoading}
-            className="w-full py-3 bg-gradient-to-r from-yellow-500 to-red-500 hover:from-yellow-600 hover:to-red-600 text-white font-semibold rounded-lg transition duration-300 transform hover:-translate-y-1 disabled:opacity-70 disabled:transform-none"
+            className="w-full py-3 bg-vibrantOrange hover:bg-vibrantOrange/90 text-white font-semibold rounded-lg transition duration-300 flex justify-center items-center" /* Changed gradient to solid vibrantOrange */
           >
             {isLoading ? (
               <span className="flex items-center justify-center">
@@ -107,10 +110,10 @@ export default function ForgotPasswordPage() {
           </button>
 
           {/* Back to Login */}
-          <div className="text-center text-gray-400">
+          <div className="text-center text-gray-700"> {/* Changed text-gray-400 to text-gray-700 */}
             <Link
               to="/auth/signin"
-              className="font-medium text-yellow-400 hover:text-yellow-300 transition-colors focus:outline-none"
+              className="font-medium text-vibrantOrange hover:text-vibrantOrange/70 transition-colors focus:outline-none" /* Changed text-yellow-400 to text-vibrantOrange */
             >
               Back to sign in
             </Link>

@@ -1,8 +1,6 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 
-// No Firebase or Appwrite code is present in this file.
-
 function Products() {
     const navigate = useNavigate();
 

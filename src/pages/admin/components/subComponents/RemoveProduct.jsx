@@ -1,127 +1,163 @@
 import React, { useState, useEffect } from 'react';
-// import productsService from '../../../../firebase/ProductsService';
+import { useGetProductsAdminQuery, useDeleteProductsMutation, useGetAllCategoriesQuery } from '../../../../features/RTKQUERY';
 
 function RemoveProduct() {
-  const [products, setProducts] = useState([]);
   const [selectedProducts, setSelectedProducts] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
-  const [categoryFilter, setCategoryFilter] = useState('all');
-  const [isLoading, setIsLoading] = useState(true);
-  const [isDeleting, setIsDeleting] = useState(false);
+  const [categoryFilter, setCategoryFilter] = useState('all'); // This will now hold category _id or 'all'
   const [showConfirmation, setShowConfirmation] = useState(false);
-  const [successMessage, setSuccessMessage] = useState('');
+  const [statusMessage, setStatusMessage] = useState({ type: '', message: '' }); // Unified status message
 
-  // Load products on component mount
+  // RTK Query hook for fetching products
+  const {
+    data: productsData,
+    isLoading: areProductsLoading,
+    isError: productsFetchError,
+    error: productsErrorDetails,
+    refetch: refetchProducts
+  } = useGetProductsAdminQuery();
+
+  // RTK Query hook for fetching categories
+  const {
+    data: categoriesData,
+    isLoading: areCategoriesLoading,
+    isError: categoriesFetchError,
+    error: categoriesErrorDetails,
+    refetch: refetchCategories
+  } = useGetAllCategoriesQuery(); // Correct hook for getting all categories
+
+  // RTK Query mutation for deleting products
+  const [deleteProducts, {
+    isLoading: isDeleting,
+    isSuccess: deleteSuccess,
+    isError: deleteError,
+    error: deleteErrorData,
+    reset: resetDeleteMutationState
+  }] = useDeleteProductsMutation();
+
+  // Extract products array from response, default to empty array
+  const products = productsData?.product || [];
+  // Extract categories array from response, filter for active ones
+  const categories = (categoriesData?.categories || []).filter(cat => cat.active);
+
+  // Consolidated loading and error states
+  const isLoading = areProductsLoading || areCategoriesLoading || isDeleting;
+  const mainError = productsFetchError || categoriesFetchError ?
+    (productsErrorDetails?.data?.message || categoriesErrorDetails?.data?.message || 'Failed to load initial data.') : null;
+
   useEffect(() => {
-    const fetchProducts = async () => {
-      try {
-        setIsLoading(true);
-        // Replace with your API call
-        // const productsData = await fetch('/api/products').then(res => res.json());
-        // setProducts(productsData);
-        // Demo data:
-        setProducts([
-          {
-            id: 1,
-            name: "Classic Ramen",
-            description: "Delicious ramen with pork broth.",
-            image: "/images/ramen1.jpg",
-            category: "ramen",
-            price: 12.99,
-            inStock: true,
-            featured: true
-          }
-        ]);
-      } catch (error) {
-        console.error('Failed to load products:', error);
-      } finally {
-        setIsLoading(false);
+    let timer;
+    if (deleteSuccess) {
+      setStatusMessage({ type: 'success', message: `Successfully deleted ${selectedProducts.length} product${selectedProducts.length > 1 ? 's' : ''}.` });
+      setSelectedProducts([]); // Clear selection after successful deletion
+      resetDeleteMutationState(); // Reset RTK Query mutation state
+      timer = setTimeout(() => setStatusMessage({ type: '', message: '' }), 3000);
+    } else if (deleteError) {
+      console.error('Error deleting products:', deleteErrorData);
+      let displayErrorMessage = 'Failed to delete product(s).';
+      if (deleteErrorData) {
+        if (typeof deleteErrorData.data === 'string' && deleteErrorData.data.startsWith('<!DOCTYPE html>')) {
+          displayErrorMessage = `Server error during deletion (Status: ${deleteErrorData.originalStatus || 'Unknown'}). Please check backend logs.`;
+        } else if (deleteErrorData.data?.message) {
+          displayErrorMessage = `Failed to delete: ${deleteErrorData.data.message}`;
+        } else if (deleteErrorData.error) {
+          displayErrorMessage = `Deletion error: ${deleteErrorData.error}`;
+        }
       }
-    };
-    
-    fetchProducts();
-  }, []);
+      setStatusMessage({ type: 'error', message: displayErrorMessage }); // Display the error message
+      resetDeleteMutationState(); // Reset RTK Query mutation state
+      timer = setTimeout(() => setStatusMessage({ type: '', message: '' }), 5000);
+    }
+    return () => clearTimeout(timer);
+  }, [deleteSuccess, deleteError, selectedProducts.length, deleteErrorData, resetDeleteMutationState]);
 
-  // Filter products based on search term and category
+
   const filteredProducts = products.filter(product => {
-    const matchesSearch = product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                          product.description.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesCategory = categoryFilter === 'all' || product.category === categoryFilter;
+    const productName = product.productName ?? '';
+    const productDescription = product.description ?? '';
+    // Access category name for search if populated, otherwise assume it's the ID string
+    const productCategoryName = typeof product.category === 'object' && product.category !== null
+                                ? (product.category.name ?? '')
+                                : (product.category ?? '');
+    // Access category ID for filtering if populated, otherwise assume it's the ID string
+    const productCategoryId = typeof product.category === 'object' && product.category !== null
+                                ? (product.category._id ?? '')
+                                : (product.category ?? ''); // This would be the ID if not populated
+
+    const matchesSearch = productName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                          productDescription.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                          productCategoryName.toLowerCase().includes(searchTerm.toLowerCase());
+
+    const matchesCategory = categoryFilter === 'all' || productCategoryId === categoryFilter;
+
     return matchesSearch && matchesCategory;
   });
 
-  // Handle checkbox selection
+  // Handle individual product checkbox selection
   const handleProductSelection = (productId) => {
     setSelectedProducts(prevSelected => {
       if (prevSelected.includes(productId)) {
-        return prevSelected.filter(id => id !== productId);
+        return prevSelected.filter(id => id !== productId); // Deselect if already selected
       } else {
-        return [...prevSelected, productId];
+        return [...prevSelected, productId]; // Select if not already selected
       }
     });
   };
 
-  // Select all displayed products
+  // Handle "Select All" checkbox
   const handleSelectAll = () => {
-    if (selectedProducts.length === filteredProducts.length) {
+    if (selectedProducts.length === filteredProducts.length && filteredProducts.length > 0) {
       setSelectedProducts([]);
     } else {
-      setSelectedProducts(filteredProducts.map(product => product.id));
+      setSelectedProducts(filteredProducts.map(product => product._id)); // Use product._id
     }
   };
 
-  // Confirm deletion
+  // Show the confirmation modal for deletion
   const confirmDelete = () => {
     setShowConfirmation(true);
   };
 
-  // Cancel deletion
+  // Hide the confirmation modal
   const cancelDelete = () => {
     setShowConfirmation(false);
   };
 
-  // Delete selected products
+  // Function to delete selected products (calls the RTK Query mutation)
   const deleteSelectedProducts = async () => {
     if (selectedProducts.length === 0) return;
-    setIsDeleting(true);
+
     try {
-      // Replace with your API call
-      // await fetch('/api/products/delete', { method: 'POST', body: JSON.stringify({ ids: selectedProducts }) });
-      setProducts(products.filter(product => !selectedProducts.includes(product.id)));
-      setSelectedProducts([]);
-      setSuccessMessage(`Successfully deleted ${selectedProducts.length} product${selectedProducts.length > 1 ? 's' : ''}`);
-      setTimeout(() => {
-        setSuccessMessage('');
-      }, 3000);
+      await deleteProducts(selectedProducts).unwrap();
     } catch (error) {
-      console.error('Error deleting products:', error);
+      // Errors handled by useEffect
+      console.error("Failed to initiate batch delete operation:", error);
     } finally {
-      setIsDeleting(false);
-      setShowConfirmation(false);
+      setShowConfirmation(false); // Close the confirmation modal regardless
     }
   };
 
-  // Format currency
+  // Helper function to format currency
   const formatCurrency = (amount) => {
     return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(amount);
   };
-  
+
   return (
-    <div className='flex flex-col space-y-6 max-w-6xl mx-auto'>
-      {/* Header */}
-      <div className="bg-white/90 rounded-xl shadow-md overflow-hidden">
+    <div className='flex flex-col space-y-6 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8'>
+      {/* Header Section */}
+      <div className="bg-white/90 rounded-xl shadow-md overflow-hidden backdrop-blur-md">
         <div className="p-6">
           <div className="flex flex-col md:flex-row justify-between items-start md:items-center">
             <div>
-              <h2 className="text-2xl font-bold text-black mb-2">
-                Remove <span className="bg-clip-text text-transparent bg-vibrantOrange">Products</span>
+              <h2 className="text-3xl font-extrabold text-black mb-2">
+                Remove <span className="bg-clip-text text-transparent bg-gradient-to-r from-softOrange to-vibrantOrange">Products</span>
               </h2>
-              <p className="text-gray-600">
-                Delete products from your menu
+              <p className="text-gray-600 text-lg">
+                Delete products from your menu permanently.
               </p>
-              <div className="w-24 h-1 bg-gradient-to-r from-softOrange via-vibrantOrange to-softOrange mt-4"></div>
+              <div className="w-24 h-1 bg-gradient-to-r from-softOrange via-vibrantOrange to-softOrange mt-4 rounded-full"></div>
             </div>
-            <div className="mt-4 md:mt-0 flex flex-col sm:flex-row space-y-3 sm:space-y-0 sm:space-x-3">
+            <div className="mt-6 md:mt-0 flex flex-col sm:flex-row space-y-3 sm:space-y-0 sm:space-x-3">
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                   <svg className="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -133,38 +169,43 @@ function RemoveProduct() {
                   placeholder="Search products..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  className="pl-10 pr-4 py-2 w-full lg:w-64 bg-softOrange/40 text-black rounded-lg focus:outline-none focus:ring-2 focus:ring-vibrantOrange"
+                  className="pl-10 pr-4 py-2 w-full lg:w-64 bg-softOrange/40 text-black rounded-lg focus:outline-none focus:ring-2 focus:ring-vibrantOrange transition duration-200"
                 />
               </div>
               <select
                 value={categoryFilter}
                 onChange={(e) => setCategoryFilter(e.target.value)}
                 className="px-4 py-2 bg-softOrange/40 text-black rounded-lg focus:outline-none focus:ring-2 focus:ring-vibrantOrange"
+                disabled={areCategoriesLoading}
               >
                 <option value="all">All Categories</option>
-                <option value="ramen">Ramen</option>
-                <option value="sushi">Sushi</option>
-                <option value="appetizers">Appetizers</option>
-                <option value="desserts">Desserts</option>
-                <option value="drinks">Drinks</option>
+                {areCategoriesLoading ? (
+                  <option disabled>Loading categories...</option>
+                ) : categories.length > 0 ? (
+                  categories.map(cat => (
+                    <option key={cat._id} value={cat._id}>{cat.name}</option> // Value is _id, display name
+                  ))
+                ) : (
+                  <option disabled>No categories available</option>
+                )}
               </select>
             </div>
           </div>
         </div>
       </div>
 
-      {/* Success Message */}
-      {successMessage && (
-        <div className="bg-green-500/10 border border-green-500 text-green-600 px-4 py-3 rounded-lg flex items-center">
+      {/* Success/Error Message Display */}
+      {statusMessage.message && (
+        <div className={`px-4 py-3 rounded-lg flex items-center shadow-sm ${statusMessage.type === 'success' ? 'bg-green-500/10 border border-green-500 text-green-600' : 'bg-red-500/10 border border-red-500 text-red-600'}`}>
           <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={statusMessage.type === 'success' ? "M5 13l4 4L19 7" : "M10 14l2-2m0 0l2-2m-2 2L10 6m2 6l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"} />
           </svg>
-          <span>{successMessage}</span>
+          <span>{statusMessage.message}</span>
         </div>
       )}
 
-      {/* Main content */}
-      <div className="bg-white/90 rounded-xl shadow-md overflow-hidden">
+      {/* Main Content Area: Product Table */}
+      <div className="bg-white/90 rounded-xl shadow-md overflow-hidden backdrop-blur-md">
         <div className="px-6 py-4 border-b border-softOrange/40 flex justify-between items-center">
           <div className="flex items-center">
             <h3 className="text-lg font-semibold text-black">Select Products to Remove</h3>
@@ -178,6 +219,7 @@ function RemoveProduct() {
             <button
               onClick={confirmDelete}
               className="px-4 py-2 bg-red-500/10 text-red-600 hover:bg-red-500/20 font-medium rounded-lg transition duration-300 flex items-center"
+              disabled={isDeleting}
             >
               <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
@@ -186,6 +228,8 @@ function RemoveProduct() {
             </button>
           )}
         </div>
+
+        {/* Loading, Error, or Product List Content */}
         {isLoading ? (
           <div className="p-8 flex justify-center">
             <div className="flex items-center space-x-2">
@@ -195,6 +239,15 @@ function RemoveProduct() {
               </svg>
               <span className="text-vibrantOrange">Loading products...</span>
             </div>
+          </div>
+        ) : mainError ? (
+          <div className="p-8 text-center text-red-600">
+            <h2 className="text-2xl font-bold mb-4">Error Loading Products</h2>
+            <p className="text-gray-600">Failed to fetch products. Please try again later.</p>
+            <p className="text-sm text-gray-500">Error: {mainError}</p>
+            <button onClick={() => {refetchProducts(); refetchCategories();}} className="mt-4 px-4 py-2 bg-vibrantOrange text-white rounded-lg hover:bg-softOrange transition-colors">
+              Try Again
+            </button>
           </div>
         ) : (
           <>
@@ -221,34 +274,37 @@ function RemoveProduct() {
                   </thead>
                   <tbody className="divide-y divide-softOrange/40">
                     {filteredProducts.map((product, index) => (
-                      <tr 
-                        key={product.id} 
-                        className={`${index % 2 === 0 ? 'bg-softOrange/10' : 'bg-white/60'} ${selectedProducts.includes(product.id) ? 'bg-vibrantOrange/10' : ''} hover:bg-softOrange/20 transition-colors`}
+                      <tr
+                        key={product._id}
+                        className={`${index % 2 === 0 ? 'bg-softOrange/10' : 'bg-white/60'} ${selectedProducts.includes(product._id) ? 'bg-vibrantOrange/10' : ''} hover:bg-softOrange/20 transition-colors`}
                       >
                         <td className="px-4 py-4 whitespace-nowrap">
                           <div className="flex items-center">
                             <input
                               type="checkbox"
                               className="h-4 w-4 text-vibrantOrange bg-softOrange border-softOrange rounded focus:ring-0 focus:ring-offset-0"
-                              checked={selectedProducts.includes(product.id)}
-                              onChange={() => handleProductSelection(product.id)}
+                              checked={selectedProducts.includes(product._id)}
+                              onChange={() => handleProductSelection(product._id)}
                             />
                           </div>
                         </td>
-                        <td className="px-4 py-4 whitespace-nowrap" onClick={() => handleProductSelection(product.id)}>
+                        <td className="px-4 py-4 whitespace-nowrap" onClick={() => handleProductSelection(product._id)}>
                           <div className="flex items-center cursor-pointer">
                             <div className="h-12 w-12 flex-shrink-0 rounded-md overflow-hidden">
-                              <img className="h-12 w-12 object-cover" src={product.image} alt={product.name} />
+                              <img className="h-12 w-12 object-cover"
+                                src={product.image && product.image.length > 0 ? product.image[0] : 'https://placehold.co/48x48/F7F7F7/AAAAAA?text=NoImg'}
+                                alt={product.productName || 'Product Image'}
+                              />
                             </div>
                             <div className="ml-4">
-                              <div className="text-sm font-medium text-black">{product.name}</div>
+                              <div className="text-sm font-medium text-black">{product.productName}</div>
                               <div className="text-sm text-gray-600 truncate max-w-sm">{product.description}</div>
                             </div>
                           </div>
                         </td>
                         <td className="px-4 py-4 whitespace-nowrap">
                           <span className="px-2 py-1 text-xs font-medium rounded-full bg-softOrange/40 text-black capitalize">
-                            {product.category}
+                            {product.category?.name || 'N/A'} {/* FIX: Access .name property */}
                           </span>
                         </td>
                         <td className="px-4 py-4 whitespace-nowrap text-sm text-black">
@@ -286,7 +342,7 @@ function RemoveProduct() {
           <div className="px-6 py-4 bg-softOrange/10 border-t border-softOrange/40">
             <p className="text-sm text-gray-600">
               Showing {filteredProducts.length} of {products.length} products
-              {categoryFilter !== 'all' ? ` in ${categoryFilter}` : ''}
+              {categoryFilter !== 'all' ? ` in ${categories.find(cat => cat._id === categoryFilter)?.name || 'selected category'}` : ''}
               {searchTerm ? ` matching "${searchTerm}"` : ''}
             </p>
           </div>
@@ -301,7 +357,7 @@ function RemoveProduct() {
         <div className="ml-3">
           <h4 className="text-yellow-500 font-medium">Important Note</h4>
           <p className="text-gray-600 text-sm mt-1">
-            Deleting products is permanent and cannot be undone. Deleted products will be removed from your menu, 
+            Deleting products is permanent and cannot be undone. Deleted products will be removed from your menu,
             but may still appear in past orders and sales reports.
           </p>
         </div>
@@ -309,7 +365,7 @@ function RemoveProduct() {
 
       {/* Confirmation Modal */}
       {showConfirmation && (
-        <div className="fixed inset-0 bg-black/70 flex items-center justify-center p-4 z-50">
+        <div className="fixed inset-0 bg-black/70 flex items-center justify-center p-4 z-50 backdrop-blur-sm">
           <div className="bg-white/90 rounded-xl shadow-lg max-w-md w-full relative overflow-hidden">
             <div className="p-6 border-b border-softOrange/40">
               <h3 className="text-xl font-bold text-black">Confirm Deletion</h3>
