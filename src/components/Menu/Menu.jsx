@@ -32,6 +32,7 @@ function Menu() {
     try {
       await addToCart({ productId: product._id, qty: 1 }).unwrap();
       alert('Item added to cart successfully!');
+      console.log(product)
     } catch (error) {
       console.error('Failed to add item to cart:', error);
       alert(error.data?.message || 'Failed to add item to cart. Please try again.');

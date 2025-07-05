@@ -1,17 +1,26 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useGetCartQuery,  useRemoveFromCartMutation } from '../features/RTKQUERY';
+import { useGetCartQuery, useRemoveFromCartMutation } from '../features/RTKQUERY';
 import { useSelector } from 'react-redux';
 import { selectIsAuthenticated } from '../features/authSlice';
+import { toast } from 'react-hot-toast';
 
 const CartPage = () => {
     const navigate = useNavigate();
     const isAuthenticated = useSelector(selectIsAuthenticated);
-    const { data: cartData, isLoading, error } = useGetCartQuery(undefined, {
+    const { data: cartData, isLoading, error, refetch } = useGetCartQuery(undefined, {
         skip: !isAuthenticated
     });
-    // const [updateCartItem] = useUpdateCartItemMutation();
     const [removeFromCart] = useRemoveFromCartMutation();
+    const [localCartItems, setLocalCartItems] = useState([]);
+
+    // Update local cart items when cart data changes
+    useEffect(() => {
+        if (cartData?.cart?.items) {
+            setLocalCartItems([...cartData.cart.items]);
+            console.log(cartData);
+        }
+    }, [cartData]);
 
     // Redirect to login if not authenticated
     React.useEffect(() => {
@@ -20,24 +29,39 @@ const CartPage = () => {
         }
     }, [isAuthenticated, navigate]);
 
-    const handleQuantityChange = async (itemId, newQty) => {
-        try {
-            await updateCartItem({ itemId, qty: newQty }).unwrap();
-        } catch (error) {
-            console.error('Failed to update quantity:', error);
-        }
+    const handleQuantityChange = (itemId, newQty) => {
+        setLocalCartItems(prevItems => 
+            prevItems.map(item => 
+                item._id === itemId ? { ...item, qty: newQty } : item
+            )
+        );
+        toast.success('Cart updated successfully');
     };
 
-    const handleRemoveItem = async (itemId) => {
+    const handleRemoveItem = async (item) => {
         try {
-            await removeFromCart(itemId).unwrap();
+            const result = await removeFromCart({ productId: item.product._id }).unwrap();
+            if (result.success) {
+                setLocalCartItems(prevItems => prevItems.filter(cartItem => cartItem._id !== item._id));
+                toast.success('Item removed from cart');
+                // Refetch cart data to ensure UI is in sync with backend
+                refetch();
+            } else {
+                toast.error(result.message || 'Failed to remove item');
+            }
         } catch (error) {
             console.error('Failed to remove item:', error);
+            toast.error(error.data?.message || 'Failed to remove item');
         }
     };
 
     const handleCheckout = () => {
-        navigate('/checkout');
+        if (localCartItems.length === 0) {
+            toast.error('Your cart is empty');
+            return;
+        }
+        toast.success('Proceeding to checkout');
+        navigate('/checkout', { state: { cartItems: localCartItems } });
     };
 
     if (isLoading) {
@@ -59,7 +83,7 @@ const CartPage = () => {
         );
     }
 
-    if (!cartData?.cart?.items?.length) {
+    if (!localCartItems.length) {
         return (
             <div className="min-h-screen bg-softOrange flex items-center justify-center">
                 <div className="text-center">
@@ -79,8 +103,8 @@ const CartPage = () => {
         );
     }
 
-    const subtotal = cartData.cart.items.reduce((total, item) => {
-        return total + (item.product.price * item.qty);
+    const subtotal = localCartItems.reduce((total, item) => {
+        return total + (item.product?.price * item.qty);
     }, 0);
 
     const tax = subtotal * 0.1; // 10% tax
@@ -95,23 +119,29 @@ const CartPage = () => {
                     {/* Cart Items */}
                     <div className="lg:col-span-2">
                         <div className="bg-white rounded-lg shadow-md overflow-hidden">
-                            {cartData.cart.items.map((item) => (
+                            {localCartItems.map((item) => (
                                 <div key={item._id} className="p-6 border-b border-gray-200 last:border-b-0">
                                     <div className="flex items-center">
                                         <div className="h-24 w-24 flex-shrink-0">
                                             <img
-                                                src={item.product.image[0]}
-                                                alt={item.product.name}
+                                                src={item.product?.image[0]}
+                                                alt={item.product?.productName}
                                                 className="h-full w-full object-cover rounded-lg"
                                             />
                                         </div>
                                         <div className="ml-6 flex-1">
                                             <div className="flex items-center justify-between">
-                                                <h3 className="text-lg font-medium text-gray-900">
-                                                    {item.product.name}
-                                                </h3>
+                                                <div>
+                                                    <h3 className="text-lg font-medium text-gray-900">
+                                                        {item.product?.
+                                                        productName}
+                                                    </h3>
+                                                    <p className="text-sm text-gray-500 mt-1">
+                                                        {item.product?.description}
+                                                    </p>
+                                                </div>
                                                 <p className="text-lg font-medium text-vibrantOrange">
-                                                    ${(item.product.price * item.qty).toFixed(2)}
+                                                    ${(item.product?.price * item.qty).toFixed(2)}
                                                 </p>
                                             </div>
                                             <div className="mt-4 flex items-center justify-between">
@@ -119,8 +149,9 @@ const CartPage = () => {
                                                     <button
                                                         onClick={() => handleQuantityChange(item._id, Math.max(1, item.qty - 1))}
                                                         className="p-1 rounded-full hover:bg-gray-100"
+                                                        disabled={item.qty <= 1}
                                                     >
-                                                        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-gray-500" viewBox="0 0 20 20" fill="currentColor">
+                                                        <svg xmlns="http://www.w3.org/2000/svg" className={`h-5 w-5 ${item.qty <= 1 ? 'text-gray-300' : 'text-gray-500'}`} viewBox="0 0 20 20" fill="currentColor">
                                                             <path fillRule="evenodd" d="M3 10a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z" clipRule="evenodd" />
                                                         </svg>
                                                     </button>
@@ -135,7 +166,7 @@ const CartPage = () => {
                                                     </button>
                                                 </div>
                                                 <button
-                                                    onClick={() => handleRemoveItem(item._id)}
+                                                    onClick={() => handleRemoveItem(item)}
                                                     className="text-red-500 hover:text-red-600"
                                                 >
                                                     Remove

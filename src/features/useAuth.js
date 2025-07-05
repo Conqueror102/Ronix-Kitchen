@@ -2,6 +2,7 @@ import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { useLoginUserMutation, useSignUpUserMutation } from './RTKQUERY';
 import { setCredentials, setError, setLoading, logout } from './authSlice';
+import { toast } from 'react-hot-toast';
 
 export const useAuth = () => {
   const dispatch = useDispatch();
@@ -61,6 +62,14 @@ export const useAuth = () => {
 
   const handleLogout = () => {
     dispatch(logout());
+    toast.success('Logged out successfully');
+    navigate('/auth/signin');
+  };
+
+  // Function to handle token expiration
+  const handleTokenExpiration = () => {
+    dispatch(logout());
+    toast.error('Your session has expired. Please log in again.');
     navigate('/auth/signin');
   };
 
@@ -68,5 +77,6 @@ export const useAuth = () => {
     login,
     signup,
     logout: handleLogout,
+    handleTokenExpiration,
   };
 }; 
