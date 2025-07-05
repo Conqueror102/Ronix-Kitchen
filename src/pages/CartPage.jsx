@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useGetCartQuery, useRemoveFromCartMutation, useUpdateCartItemMutation } from '../features/RTKQUERY';
 import { useSelector } from 'react-redux';
 import { selectIsAuthenticated } from '../features/authSlice';
+import { toast } from 'react-hot-toast';
 
 const CartPage = () => {
     const navigate = useNavigate();
@@ -90,7 +91,12 @@ const CartPage = () => {
     };
 
     const handleCheckout = () => {
-        navigate('/checkout');
+        if (localCartItems.length === 0) {
+            toast.error('Your cart is empty');
+            return;
+        }
+        toast.success('Proceeding to checkout');
+        navigate('/checkout', { state: { cartItems: localCartItems } });
     };
 
     if (isLoading) {
@@ -217,7 +223,7 @@ const CartPage = () => {
                                                         disabled={isThisItemProcessing || item.qty <= 1} // Disable if this item is processing or qty is 1
                                                         aria-label={`Decrease quantity of ${item.product.productName}`}
                                                     >
-                                                        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-gray-500" viewBox="0 0 20 20" fill="currentColor">
+                                                        <svg xmlns="http://www.w3.org/2000/svg" className={`h-5 w-5 ${item.qty <= 1 ? 'text-gray-300' : 'text-gray-500'}`} viewBox="0 0 20 20" fill="currentColor">
                                                             <path fillRule="evenodd" d="M3 10a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z" clipRule="evenodd" />
                                                         </svg>
                                                     </button>

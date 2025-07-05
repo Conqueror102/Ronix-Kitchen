@@ -9,18 +9,18 @@ export default function AdminPage() {
   const navigate = useNavigate();
   const location = useLocation();
   
-  // useEffect(() => {
-  //   if (!adminAuth.status) {
-  //     navigate('/admin/login', { 
-  //       replace: true,
-  //       state: { from: location.pathname }
-  //     });
-  //   }
-  // }, [adminAuth.status, navigate, location]);
+  useEffect(() => {
+    if (!adminAuth.status) {
+      navigate('/admin/login', { 
+        replace: true,
+        state: { from: location.pathname }
+      });
+    }
+  }, [adminAuth.status, navigate, location]);
   
-  // if (!adminAuth.status) {
-  //   return null;
-  // }
+  if (!adminAuth.status) {
+    return null;
+  }
   
   return (
     <div className="flex h-scree">

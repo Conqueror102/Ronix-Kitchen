@@ -130,7 +130,7 @@ export default function Header() {
                             {/* Cart Button */}
                             <div className="relative" ref={cartDropdownRef}>
                                 <button 
-                                    onClick={() => setIsCartOpen(!isCartOpen)}
+                                    onClick={() => navigate("/cart")}
                                     className="flex items-center space-x-1 py-2 px-3 bg-black hover:bg-black/95 text-gray-300 hover:text-white rounded-lg transition-colors focus:outline-none relative"
                                 >
                                     <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
